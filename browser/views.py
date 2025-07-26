@@ -20,9 +20,12 @@ from .tables import SponsortimeTable, VideoTable, UsernameTable, UserIDTable
 from .filters import VideoFilter, UsernameFilter, UserIDFilter
 
 
+china_tz = datetime.timezone(datetime.timedelta(hours=8))
+
+
 def updated() -> str:
-    date = isoparse(Config.objects.get(key='updated').value)
-    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    date = isoparse(Config.objects.get(key='updated').value).astimezone(china_tz)
+    now = datetime.datetime.now(tz=china_tz)
     return f'{date.strftime("%Y-%m-%d %H:%M:%S")} ({timeago.format(date, now)})'
 
 

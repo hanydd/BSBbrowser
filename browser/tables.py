@@ -40,7 +40,7 @@ class SponsortimeTable(tables.Table):
 
     @staticmethod
     def render_timesubmitted(value: float) -> str:
-        return datetime.fromtimestamp(float(value) / 1000., tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+        return datetime.fromtimestamp(float(value) / 1000., tz=timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S')
 
     @staticmethod
     def render_time(value: float) -> str:
