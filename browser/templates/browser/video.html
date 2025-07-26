@@ -2,24 +2,29 @@
 {% extends "browser/base.html" %}
 {% load django_bootstrap5 %}
 {% block head %}
-    <title>{{ videoid }} | SB Browser</title>
+<title>{{ videoid }} | SB Browser</title>
 {% endblock head %}
 {% block body %}
-    <div class="row mt-2">
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="ratio ratio-16x9">
-              <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/{{ videoid }}?rel=0" allowfullscreen></iframe>
-            </div>
+<div class="row mt-2">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="ratio ratio-16x9">
+            <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid={{ videoid }}" scrolling="no" border="0"
+                frameborder="no" framespacing="0" allowfullscreen="true">
+            </iframe>
         </div>
-        <div class="col-auto">
-            {% if not submissions %}
-                {% bootstrap_alert 'No submissions exist for this video, check that the Video ID is correct and when the database was last updated.' dismissible=False extra_classes='mb-1' %}
-            {% endif %}
-            <ul class="list-group">
-                {% include "browser/snippets/videodetails.html" %}
-                <li class="list-group-item"><a href="https://youtu.be/{{ videoid }}">YouTube 🔗</a></li>
-            </ul>
-        </div>
+
+
     </div>
-    {% include "browser/table.html" %}
+    <div class="col-auto">
+        {% if not submissions %}
+        {% bootstrap_alert 'No submissions exist for this video, check that the Video ID is correct and when the
+        database was last updated.' dismissible=False extra_classes='mb-1' %}
+        {% endif %}
+        <ul class="list-group">
+            {% include "browser/snippets/videodetails.html" %}
+            <li class="list-group-item"><a href="https://www.bilibili.com/video/{{ videoid }}">Bilibili 🔗</a></li>
+        </ul>
+    </div>
+</div>
+{% include "browser/table.html" %}
 {% endblock body %}
