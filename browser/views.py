@@ -26,7 +26,7 @@ china_tz = datetime.timezone(datetime.timedelta(hours=8))
 def updated() -> str:
     date = isoparse(Config.objects.get(key='updated').value).astimezone(china_tz)
     now = datetime.datetime.now(tz=china_tz)
-    return f'{date.strftime("%Y-%m-%d %H:%M:%S")} ({timeago.format(date, now)})'
+    return f'{date.strftime("%Y-%m-%d %H:%M:%S")} ({timeago.format(date, now, "zh_CN")})'
 
 
 def get_yt_video_id(url):
