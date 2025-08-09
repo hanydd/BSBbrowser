@@ -44,18 +44,14 @@ class SponsortimeTable(tables.Table):
 
     @staticmethod
     def render_time(value: float) -> str:
-        if value < 0:
-            time = f'-{str(timedelta(seconds=-value))}'
-        else:
-            time = str(timedelta(seconds=value))
-        try:
-            time, decimal = time.split('.')
-            decimal = decimal.rstrip('0')
-            if len(decimal) > 3:
-                return format_html('{}.<strong>{}</strong>', time, decimal)
-            return f'{time}.{decimal}'
-        except ValueError:
-            return time
+        # Format as mm:ss.SSS starting from minutes (no hours)
+        is_negative = value < 0
+        total_ms = int(round(abs(float(value)) * 1000))
+        minutes = total_ms // (60 * 1000)
+        seconds = (total_ms // 1000) % 60
+        millis = total_ms % 1000
+        formatted = f"{minutes:02d}:{seconds:02d}.{millis:03d}"
+        return f"-{formatted}" if is_negative else formatted
 
     @staticmethod
     def render_starttime(value: float) -> str:
@@ -110,7 +106,7 @@ class SponsortimeTable(tables.Table):
         return value
 
     @staticmethod
-    def order_username(queryset: QuerySet, is_descending: bool) -> (QuerySet, bool):
+    def order_username(queryset: QuerySet, is_descending: bool) -> tuple[QuerySet, bool]:
         if is_descending:
             queryset = queryset.select_related('user').order_by(F('user__username').desc(nulls_last=True))
         else:

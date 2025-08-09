@@ -125,6 +125,39 @@
         table.modern-table tbody tr:hover td { background: rgba(99, 102, 241, 0.06); }
         table.modern-table td, table.modern-table th { vertical-align: middle; }
 
+        /* UUID / UserID / Username cells: compact, up to two lines */
+        textarea.uuid,
+        textarea.userid,
+        textarea[name="Username"] {
+            resize: none;
+            overflow: hidden;
+            white-space: normal;
+            word-break: break-all;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: .9rem;
+            line-height: 1.2rem;
+            height: calc(1.2rem * 2 + 12px);
+            padding: 6px 10px;
+            box-shadow: none;
+        }
+        textarea.uuid { width: 13rem; max-width: 100%; }
+        textarea.userid { width: 10rem; max-width: 100%; }
+        textarea[name="Username"] { width: 12rem; max-width: 100%; }
+
+        .modern-table .clip {
+            color: var(--muted);
+            border-radius: 8px;
+            padding: 0 6px;
+            line-height: 1;
+        }
+        .modern-table .clip:hover {
+            color: var(--brand);
+            background: rgba(99,102,241,.12);
+        }
+
         /* Footer */
         .app-footer {
             color: var(--muted);
