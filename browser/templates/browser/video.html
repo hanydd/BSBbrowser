@@ -6,7 +6,7 @@
 {% endblock head %}
 {% block body %}
 <div class="row mt-2">
-    <div class="col-12 col-md-6 col-lg-4">
+    <div class="col-12 col-md-6 col-lg-4 page-section glass glow-border">
         <div class="ratio ratio-16x9">
             <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid={{ videoid }}" scrolling="no" border="0"
                 frameborder="no" framespacing="0" allowfullscreen="true">
@@ -15,7 +15,7 @@
 
 
     </div>
-    <div class="col-auto">
+    <div class="col-auto page-section glass glow-border">
         {% if not submissions %}
         {% bootstrap_alert 'No submissions exist for this video, check that the Video ID is correct and when the
         database was last updated.' dismissible=False extra_classes='mb-1' %}

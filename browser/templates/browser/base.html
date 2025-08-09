@@ -21,6 +21,7 @@
             --brand-2: #6366f1;
             --border: #e5e7eb;
             --shadow: 0 6px 20px rgba(0,0,0,.08);
+            --rainbow: conic-gradient(from 0deg at 50% 50%, #ff6b6b, #f59e0b, #f7d045, #34d399, #60a5fa, #a78bfa, #f472b6, #ff6b6b);
         }
 
         html.dark :root, html.dark {
@@ -32,6 +33,7 @@
             --brand-2: #a1a6ff;
             --border: #2b313b;
             --shadow: 0 6px 20px rgba(0,0,0,.35);
+            --rainbow: conic-gradient(from 0deg at 50% 50%, #ff6b6b, #f59e0b, #f7d045, #34d399, #60a5fa, #a78bfa, #f472b6, #ff6b6b);
         }
 
         body {
@@ -41,11 +43,21 @@
 
         /* Top navigation */
         .app-navbar {
-            border-radius: 14px;
-            background: var(--surface) !important;
+            border-radius: 16px;
+            background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 85%, var(--surface-2)), var(--surface)) !important;
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             margin: 14px auto 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .app-navbar:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(1200px 120px at -10% 0%, rgba(99,102,241,.12), transparent 60%),
+                        radial-gradient(1200px 120px at 110% 0%, rgba(99,102,241,.12), transparent 60%);
+            pointer-events: none;
         }
         .navbar-brand {
             font-weight: 700;
@@ -68,11 +80,25 @@
             box-shadow: var(--shadow);
             padding: 16px 18px;
             margin-bottom: 18px;
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+        .page-section:hover {
+            transform: none;
+            box-shadow: var(--shadow);
+            border-color: color-mix(in oklab, var(--brand) 40%, var(--border));
+        }
+        .glass { backdrop-filter: saturate(140%) blur(10px); background: color-mix(in oklab, var(--surface) 88%, transparent); }
+        .glass-sm { backdrop-filter: saturate(140%) blur(6px); }
+        .glow-border { box-shadow: var(--shadow); position: relative; }
+        .glow-border:hover {
+            border: 1px solid transparent;
+            background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box;
         }
         .section-title {
             font-size: 1.05rem;
             font-weight: 700;
             margin: 4px 0 14px;
+            letter-spacing: .02em;
         }
 
         /* Search toolbar */
@@ -87,24 +113,29 @@
         @media (max-width: 576px) {
             .search-toolbar { grid-template-columns: 1fr; }
         }
-        .search-card {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-        }
+        .search-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+        .search-card:hover { transform: none; box-shadow: none; border-color: color-mix(in oklab, var(--brand) 40%, var(--border)); background: linear-gradient(180deg, var(--surface), var(--surface-2)); }
         .search-card label {
             font-size: .78rem;
             text-transform: uppercase;
             color: var(--muted);
             margin-bottom: 6px;
             letter-spacing: .06em;
+            transition: color .2s ease;
         }
+        .search-card:hover label { color: var(--text); }
         .search-card .form-control {
             border-radius: 10px;
             height: 42px;
+            background: color-mix(in oklab, var(--surface-2) 92%, var(--surface));
+            border-color: var(--border);
+            transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
         }
         .search-card .btn { width: 100%; }
+
+        /* Generic forms highlight inside sections */
+        .page-section form .form-control { background: color-mix(in oklab, var(--surface-2) 92%, var(--surface)); border-color: var(--border); transition: background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+        .page-section form .form-control:hover, .page-section form .form-control:focus { background: var(--surface); border-color: var(--brand); box-shadow: 0 0 0 2px rgba(99,102,241,.2); }
 
         /* Table enhancements */
         .table-container {
@@ -113,16 +144,21 @@
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             background: var(--surface);
+
         }
+        .table-container:hover { transform: none; box-shadow: var(--shadow); border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box; }
         table.modern-table thead th {
             position: sticky;
             top: 0;
             z-index: 2;
             background: var(--surface);
+            background-image: linear-gradient(180deg, color-mix(in oklab, var(--surface) 70%, var(--surface-2)), var(--surface));
+            border-bottom: 1px solid var(--border);
+            text-transform: none;
         }
         table.modern-table tbody tr:nth-child(even) td { background: rgba(31, 41, 55, 0.03); }
         html.dark table.modern-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.03); }
-        table.modern-table tbody tr:hover td { background: rgba(99, 102, 241, 0.06); }
+        table.modern-table tbody tr:hover td { background: rgba(99, 102, 241, 0.08); transition: background .2s ease; }
         table.modern-table td, table.modern-table th { vertical-align: middle; }
 
         /* UUID / UserID / Username cells: compact, up to two lines */
@@ -157,6 +193,50 @@
             color: var(--brand);
             background: rgba(99,102,241,.12);
         }
+
+        /* List sections */
+        .page-section .list-group { --bs-list-group-bg: transparent; }
+        .page-section .list-group-item { background: transparent; border-color: var(--border); border-radius: 10px; margin-right: 8px; }
+        .page-section .list-group-item + .list-group-item { margin-left: 0; }
+
+        /* Buttons */
+        .btn-primary { position: relative; overflow: hidden; }
+        .btn-primary::after {
+            content: ""; position: absolute; inset: 0; background: radial-gradient(200px 60px at var(--x,50%) -20%, rgba(255,255,255,.25), transparent 60%);
+            opacity: 0; transition: opacity .25s ease;
+        }
+        .btn-primary:hover::after { opacity: 1; }
+
+        /* Search button: cursor-follow glow */
+        .search-card .btn-primary {
+            position: relative;
+            isolation: isolate; /* keep pseudo-element behind text */
+            --glow-x: 50%;
+            --glow-y: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-2));
+            border: 1px solid transparent;
+            border-radius: 10px;
+            transition: box-shadow .25s ease, filter .25s ease;
+        }
+        .search-card .btn-primary::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(160px 160px at var(--glow-x) var(--glow-y), rgba(99,102,241,.35), transparent 60%),
+                radial-gradient(300px 300px at var(--glow-x) var(--glow-y), rgba(99,102,241,.18), transparent 70%);
+            opacity: 0;
+            transition: opacity .18s ease;
+        }
+        .search-card .btn-primary:hover::before { opacity: 1; }
+        .search-card .btn-primary:hover { box-shadow: 0 0 0 2px rgba(99,102,241,.25), 0 10px 26px rgba(99,102,241,.22); filter: saturate(116%) brightness(1.03); }
+
+        /* Small accent animation for icons */
+        @keyframes pulse-fade { 0% { opacity: .45; } 50% { opacity: .9; } 100% { opacity: .45; } }
+        .muted-pulse { animation: pulse-fade 2.6s ease-in-out infinite; }
 
         /* Footer */
         .app-footer {

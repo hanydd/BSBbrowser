@@ -5,11 +5,11 @@
 {% endblock head %}
 {% block body %}
     <div class="row mt-2">
-        <div class="col-auto">
+        <div class="col-auto page-section glass glow-border">
             {% include 'browser/snippets/userid_details.html' %}
         </div>
         {% if warnings %}
-        <div class="col-auto">
+        <div class="col-auto page-section glass glow-border">
             <ul class="list-group">
                 <li class="list-group-item">Active warnings:</li>
                 {% for warning in warnings %}

@@ -25,3 +25,17 @@ for (let i = 0, element; element = elements[i]; i++) {
 }
 
 window.onpagehide = function(){};
+
+// Cursor-follow glow for search buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const searchButtons = document.querySelectorAll('.search-card .btn-primary');
+  searchButtons.forEach((btn) => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      btn.style.setProperty('--glow-x', `${x}px`);
+      btn.style.setProperty('--glow-y', `${y}px`);
+    });
+  });
+});

@@ -5,13 +5,13 @@
 {% endblock head %}
 {% block body %}
     <div class="row">
-        <div class="col-12 col-md-6 col-lg-4 mt-2">
+        <div class="col-12 col-md-6 col-lg-4 mt-2 page-section glass glow-border">
             <div class="ratio ratio-16x9">
                 <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid={{ videoid }}" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
             </div>
         </div>
-        <div class="col-auto mt-2">
-            <div class="col-auto mt-2">
+        <div class="col-auto mt-2 page-section glass glow-border">
+            <div class="col-auto mt-2 ">
                 <ul class="list-group">
                     <li class="list-group-item">UUID: {{ uuid.uuid }} <button type="button" class="btn btn-secondary btn-sm clip" data-value="{{ uuid.uuid }}">✂</button></li>
                     <li class="list-group-item">UserID: <a href="/userid/{{ uuid.user_id }}/">{{ uuid.user_id }}</a>{% if vip %}<span title="This user is a VIP" class="ms-1">👑</span>{% endif %}</li>
@@ -23,13 +23,13 @@
                     <li class="list-group-item">User Agent: {% if uuid.useragent %}{{ uuid.useragent }}{% else %}—{% endif %}</li>
                 </ul>
             </div>
-            <div class="col-auto mt-2">
+            <div class="col-auto mt-2 page-section glass glow-border">
                 {% include 'browser/snippets/userid_details.html' %}
             </div>
         </div>
     </div>
     <div class="row mb-4">
-        <div class="col-auto mt-2">
+        <div class="col-auto mt-2 page-section glass glow-border">
             <ul class="list-group">
                 {% include "browser/snippets/videodetails.html" %}
                 <li class="list-group-item"><a href="https://www.bilibili.com/video/{{ videoid }}{% if start != 0 %}?t={{ start }}s{% endif %}#requiredSegment={{ uuid.uuid }}">Bilibili 🔗</a> (with requiredSegment and start time)<a class="float-end ms-1" href="/video/{{ videoid }}/">Video page 🔗</a></li>
