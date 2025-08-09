@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta, timezone
 
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django.db.models import F, QuerySet
 
 import django_tables2 as tables
@@ -13,23 +14,26 @@ from .columns import LengthColumn
 class SponsortimeTable(tables.Table):
     videoid = tables.TemplateColumn('<a href="/video/{{ value }}/">{{ value }}</a>'
                                     '<button class="clip" data-value="{{ value }}">✂</button>'
-                                    '<a href="https://www.bilibili.com/video/{{ value }}">Bili</a>', verbose_name='VideoID')
+                                    '<a href="https://www.bilibili.com/video/{{ value }}">Bili</a>', verbose_name=_('视频ID'))
     uuid = tables.TemplateColumn('<textarea class="form-control uuid" name="UUID" readonly>{{ value }}</textarea>'
                                  '<button class="clip" data-value="{{ value }}">✂</button>'
-                                 '<a href="/uuid/{{ value }}/">🔗</a>', verbose_name='UUID')
+                                 '<a href="/uuid/{{ value }}/">🔗</a>', verbose_name=_('UUID'))
     userid = tables.TemplateColumn('<textarea class="form-control userid" name="UserID" readonly>{{ value }}</textarea>'
                                    '<button class="clip" data-value="{{ value }}">✂</button>'
                                    '<a href="/userid/{{ value }}/">🔗</a>',
-                                   verbose_name='UserID', accessor='user_id')
+                                   verbose_name=_('用户公开ID'), accessor='user_id')
     username = tables.TemplateColumn('{% if value %}'
                                      '<textarea class="form-control" name="Username" readonly>{{ value }}</textarea>'
                                      '<button class="clip" data-value="{{ value }}">✂</button>'
                                      '<a href="/username/{{ value|urlencode }}/">🔗</a>'
-                                     '{% else %}—{% endif %}', accessor='user__username')
-    length = LengthColumn(initial_sort_descending=True)
-    votes = tables.Column(initial_sort_descending=True)
-    views = tables.Column(initial_sort_descending=True)
-    actiontype = tables.Column(verbose_name='Action')
+                                     '{% else %}—{% endif %}', accessor='user__username', verbose_name=_('用户名'))
+    length = LengthColumn(initial_sort_descending=True, verbose_name=_('时长'))
+    votes = tables.Column(initial_sort_descending=True, verbose_name=_('投票'))
+    views = tables.Column(initial_sort_descending=True, verbose_name=_('观看'))
+    actiontype = tables.Column(verbose_name=_('操作'))
+    category = tables.Column(verbose_name=_('类型'))
+    hidden = tables.Column(verbose_name=_('隐藏'))
+    shadowhidden = tables.Column(verbose_name=_('伪隐藏'))
 
     class Meta: # noqa
         model = Sponsortime

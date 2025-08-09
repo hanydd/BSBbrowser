@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 from django_filters import FilterSet, CharFilter, ChoiceFilter, MultipleChoiceFilter, RangeFilter
+from django.utils.translation import gettext_lazy as _
 from django_filters.widgets import RangeWidget
 
 from .models import Sponsortime
@@ -18,22 +19,22 @@ class CustomRangeWidget(RangeWidget):
 
 
 class UserIDFilter(FilterSet):
-    votes = RangeFilter(widget=CustomRangeWidget(attrs={'type': 'number', 'step': 1},
-                                                 from_attrs={'placeholder': 'Votes from'},
-                                                 to_attrs={'placeholder': 'Votes to'}))
-    views = RangeFilter(widget=CustomRangeWidget(attrs={'type': 'number', 'step': 1},
-                                                 from_attrs={'placeholder': 'Views from'},
-                                                 to_attrs={'placeholder': 'Views to'}))
-    category = MultipleChoiceFilter(choices=(('chapter', 'Chapter'), ('exclusive_access', 'Exclusive Access'),
+    votes = RangeFilter(label=_('投票'), widget=CustomRangeWidget(attrs={'type': 'number', 'step': 1},
+                                                 from_attrs={'placeholder': _('投票下限')},
+                                                 to_attrs={'placeholder': _('投票上限')}))
+    views = RangeFilter(label=_('观看'), widget=CustomRangeWidget(attrs={'type': 'number', 'step': 1},
+                                                 from_attrs={'placeholder': _('观看下限')},
+                                                 to_attrs={'placeholder': _('观看上限')}))
+    category = MultipleChoiceFilter(choices=(('exclusive_access', 'Exclusive Access'),
                                              ('filler', 'Filler'), ('poi_highlight', 'Highlight'),
                                              ('interaction', 'Interaction'), ('intro', 'Intro'),
                                              ('music_offtopic', 'Non-Music'), ('outro', 'Outro'),
                                              ('preview', 'Preview'), ('selfpromo', 'Selfpromo'),
                                              ('sponsor', 'Sponsor'),), distinct=False)
     category.always_filter = False
-    shadowhidden = ChoiceFilter(choices=((0, 'No'), (1, 'Yes')), empty_label='Shadowhidden',
+    shadowhidden = ChoiceFilter(label=_('伪隐藏'), choices=((0, _('否')), (1, _('是'))), empty_label=_('伪隐藏'),
                                 method='shadowhidden_filter')
-    actiontype = MultipleChoiceFilter(choices=(('chapter', 'Chapter'), ('full', 'Full Video Label'),
+    actiontype = MultipleChoiceFilter(choices=(('full', 'Full Video Label'),
                                                ('poi', 'Highlight'), ('mute', 'Mute'), ('skip', 'Skip')),
                                       distinct=False)
 
@@ -50,7 +51,7 @@ class UserIDFilter(FilterSet):
 
 
 class UsernameFilter(UserIDFilter):
-    user = CharFilter()
+    user = CharFilter(label=_('用户公开ID'))
 
     class Meta:
         model = Sponsortime
@@ -59,7 +60,7 @@ class UsernameFilter(UserIDFilter):
 
 
 class SponsortimeFilter(UsernameFilter):
-    username = CharFilter(field_name='user__username', label='Username', lookup_expr='icontains')
+    username = CharFilter(field_name='user__username', label=_('用户名'), lookup_expr='icontains')
 
     class Meta:
         model = Sponsortime

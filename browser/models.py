@@ -48,17 +48,16 @@ class Lockcategory(models.Model):
 
 
 class Sponsortime(models.Model):
-    videoid = models.TextField(verbose_name='Video ID', db_column='videoID')
+    videoid = models.TextField(verbose_name='视频ID', db_column='videoID')
     # cid = models.TextField(verbose_name='CID', db_column='cid')
-    starttime = models.FloatField(verbose_name='Start', db_column='startTime')
-    endtime = models.FloatField(verbose_name='End', db_column='endTime')
+    starttime = models.FloatField(verbose_name='开始', db_column='startTime')
+    endtime = models.FloatField(verbose_name='结束', db_column='endTime')
     votes = models.IntegerField()
     locked = models.IntegerField(default=0)
     incorrectvotes = models.IntegerField(default=1, db_column='incorrectVotes')
     uuid = models.TextField(primary_key=True, verbose_name='UUID', db_column='UUID')
-    user = models.ForeignKey(Username, on_delete=models.PROTECT, db_constraint=False, verbose_name='UserID',
-                             db_column='userID')
-    timesubmitted = models.BigIntegerField(verbose_name='Submitted', db_column='timeSubmitted')
+    user = models.ForeignKey(Username, on_delete=models.PROTECT, db_constraint=False, verbose_name='用户公开ID', db_column='userID')
+    timesubmitted = models.BigIntegerField(verbose_name='提交时间', db_column='timeSubmitted')
     views = models.IntegerField()
     category = models.TextField(default='sponsor')
     actiontype = models.TextField(default='skip', db_column='actionType')
@@ -66,7 +65,7 @@ class Sponsortime(models.Model):
     videoduration = models.FloatField(default=0, db_column='videoDuration')
     hidden = models.IntegerField(default=0)
     reputation = models.FloatField(default=0)
-    shadowhidden = models.IntegerField(verbose_name='Shadowhidden', db_column='shadowHidden')
+    shadowhidden = models.IntegerField(verbose_name='伪隐藏', db_column='shadowHidden')
     hashedvideoid = models.TextField(blank=True, default='', db_column='hashedVideoID')
     useragent = models.TextField(blank=True, default='', db_column='userAgent')
     description = models.TextField(blank=True, default='')
