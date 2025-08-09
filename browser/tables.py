@@ -15,18 +15,38 @@ class SponsortimeTable(tables.Table):
     videoid = tables.TemplateColumn('<a href="/video/{{ value }}/">{{ value }}</a>'
                                     '<button class="clip" data-value="{{ value }}">✂</button>'
                                     '<a href="https://www.bilibili.com/video/{{ value }}">Bili</a>', verbose_name=_('视频ID'))
-    uuid = tables.TemplateColumn('<textarea class="form-control uuid" name="UUID" readonly>{{ value }}</textarea>'
-                                 '<button class="clip" data-value="{{ value }}">✂</button>'
-                                 '<a href="/uuid/{{ value }}/">🔗</a>', verbose_name=_('UUID'))
-    userid = tables.TemplateColumn('<textarea class="form-control userid" name="UserID" readonly>{{ value }}</textarea>'
-                                   '<button class="clip" data-value="{{ value }}">✂</button>'
-                                   '<a href="/userid/{{ value }}/">🔗</a>',
-                                   verbose_name=_('用户公开ID'), accessor='user_id')
-    username = tables.TemplateColumn('{% if value %}'
-                                     '<textarea class="form-control" name="Username" readonly>{{ value }}</textarea>'
-                                     '<button class="clip" data-value="{{ value }}">✂</button>'
-                                     '<a href="/username/{{ value|urlencode }}/">🔗</a>'
-                                     '{% else %}—{% endif %}', accessor='user__username', verbose_name=_('用户名'))
+    uuid = tables.TemplateColumn(
+        '<div class="cell-grid">'
+        '<textarea class="form-control uuid" name="UUID" readonly>{{ value }}</textarea>'
+        '<div class="cell-actions">'
+        '<button class="clip" data-value="{{ value }}" title="复制">✂</button>'
+        '<a href="/uuid/{{ value }}/" class="cell-link" title="详情">🔗</a>'
+        '</div>'
+        '</div>',
+        verbose_name=_('UUID')
+    )
+    userid = tables.TemplateColumn(
+        '<div class="cell-grid">'
+        '<textarea class="form-control userid" name="UserID" readonly>{{ value }}</textarea>'
+        '<div class="cell-actions">'
+        '<button class="clip" data-value="{{ value }}" title="复制">✂</button>'
+        '<a href="/userid/{{ value }}/" class="cell-link" title="详情">🔗</a>'
+        '</div>'
+        '</div>',
+        verbose_name=_('用户公开ID'), accessor='user_id'
+    )
+    username = tables.TemplateColumn(
+        '{% if value %}'
+        '<div class="cell-grid">'
+        '<textarea class="form-control" name="Username" readonly>{{ value }}</textarea>'
+        '<div class="cell-actions">'
+        '<button class="clip" data-value="{{ value }}" title="复制">✂</button>'
+        '<a href="/username/{{ value|urlencode }}/" class="cell-link" title="详情">🔗</a>'
+        '</div>'
+        '</div>'
+        '{% else %}—{% endif %}',
+        accessor='user__username', verbose_name=_('用户名')
+    )
     length = LengthColumn(initial_sort_descending=True, verbose_name=_('时长'))
     votes = tables.Column(initial_sort_descending=True, verbose_name=_('投票'))
     views = tables.Column(initial_sort_descending=True, verbose_name=_('观看'))

@@ -170,7 +170,7 @@
         }
         textarea.uuid { width: 13rem; max-width: 100%; }
         textarea.userid { width: 10rem; max-width: 100%; }
-        textarea[name="Username"] { width: 12rem; max-width: 100%; }
+        textarea[name="Username"] { width: 8.5rem; max-width: 100%; }
 
         .modern-table .clip {
             color: var(--muted);
@@ -182,6 +182,12 @@
             color: var(--brand);
             background: rgba(99,102,241,.12);
         }
+
+        /* Cell grid to stack actions vertically */
+        .cell-grid { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: start; }
+        .cell-actions { display: grid; grid-auto-rows: min-content; gap: 6px; }
+        .cell-actions .clip, .cell-actions .cell-link { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); background: var(--surface-2); }
+        .cell-actions .clip:hover, .cell-actions .cell-link:hover { color: var(--brand); border-color: var(--brand); background: var(--surface); }
 
         /* List sections */
         .page-section .list-group { --bs-list-group-bg: transparent; }
