@@ -33,7 +33,6 @@
             --brand-2: #a1a6ff;
             --border: #2b313b;
             --shadow: 0 6px 20px rgba(0,0,0,.35);
-            --rainbow: conic-gradient(from 0deg at 50% 50%, #ff6b6b, #f59e0b, #f7d045, #34d399, #60a5fa, #a78bfa, #f472b6, #ff6b6b);
         }
 
         body {
@@ -73,11 +72,14 @@
         }
 
         /* Sections */
-        .page-section {
+        .page-section,
+        .table-container {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 14px;
             box-shadow: var(--shadow);
+        }
+        .page-section {
             padding: 16px 18px;
             margin-bottom: 18px;
             transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
@@ -124,13 +126,7 @@
             transition: color .2s ease;
         }
         .search-card:hover label { color: var(--text); }
-        .search-card .form-control {
-            border-radius: 10px;
-            height: 42px;
-            background: color-mix(in oklab, var(--surface-2) 92%, var(--surface));
-            border-color: var(--border);
-            transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
-        }
+        .search-card .form-control { border-radius: 10px; height: 42px; }
         .search-card .btn { width: 100%; }
 
         /* Generic forms highlight inside sections */
@@ -138,15 +134,8 @@
         .page-section form .form-control:hover, .page-section form .form-control:focus { background: var(--surface); border-color: var(--brand); box-shadow: 0 0 0 2px rgba(99,102,241,.2); }
 
         /* Table enhancements */
-        .table-container {
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            background: var(--surface);
-
-        }
-        .table-container:hover { transform: none; box-shadow: var(--shadow); border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box; }
+        .table-container { overflow: hidden; }
+        .table-container:hover { transform: none; box-shadow: var(--shadow); }
         table.modern-table thead th {
             position: sticky;
             top: 0;
@@ -201,11 +190,6 @@
 
         /* Buttons */
         .btn-primary { position: relative; overflow: hidden; }
-        .btn-primary::after {
-            content: ""; position: absolute; inset: 0; background: radial-gradient(200px 60px at var(--x,50%) -20%, rgba(255,255,255,.25), transparent 60%);
-            opacity: 0; transition: opacity .25s ease;
-        }
-        .btn-primary:hover::after { opacity: 1; }
 
         /* Search button: cursor-follow glow */
         .search-card .btn-primary {
@@ -233,6 +217,12 @@
         }
         .search-card .btn-primary:hover::before { opacity: 1; }
         .search-card .btn-primary:hover { box-shadow: 0 0 0 2px rgba(99,102,241,.25), 0 10px 26px rgba(99,102,241,.22); filter: saturate(116%) brightness(1.03); }
+        /* Shared rainbow border on hover */
+        .glow-border:hover,
+        .table-container:hover {
+            border: 1px solid transparent;
+            background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--rainbow) border-box;
+        }
 
         /* Small accent animation for icons */
         @keyframes pulse-fade { 0% { opacity: .45; } 50% { opacity: .9; } 100% { opacity: .45; } }
