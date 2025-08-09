@@ -11,6 +11,126 @@
         rel="stylesheet">
     <link rel="icon" type="image/png" href="{% static 'browser/logo.png' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'browser/style.css' %}">
+    <style>
+        :root {
+            --surface: #ffffff;
+            --surface-2: #f5f7fb;
+            --text: #2a2e37;
+            --muted: #6b7280;
+            --brand: #4f46e5;
+            --brand-2: #6366f1;
+            --border: #e5e7eb;
+            --shadow: 0 6px 20px rgba(0,0,0,.08);
+        }
+
+        html.dark :root, html.dark {
+            --surface: #15181e;
+            --surface-2: #1b2028;
+            --text: #e5e7eb;
+            --muted: #9aa4b2;
+            --brand: #8b8ff7;
+            --brand-2: #a1a6ff;
+            --border: #2b313b;
+            --shadow: 0 6px 20px rgba(0,0,0,.35);
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--surface-2), var(--surface));
+            color: var(--text);
+        }
+
+        /* Top navigation */
+        .app-navbar {
+            border-radius: 14px;
+            background: var(--surface) !important;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin: 14px auto 18px;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+        .navbar .btn-primary, .btn-primary {
+            background: var(--brand);
+            border-color: var(--brand);
+        }
+        .navbar .btn-primary:hover, .btn-primary:hover {
+            background: var(--brand-2);
+            border-color: var(--brand-2);
+        }
+
+        /* Sections */
+        .page-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 16px 18px;
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 4px 0 14px;
+        }
+
+        /* Search toolbar */
+        .search-toolbar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 992px) {
+            .search-toolbar { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .search-toolbar { grid-template-columns: 1fr; }
+        }
+        .search-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .search-card label {
+            font-size: .78rem;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: .06em;
+        }
+        .search-card .form-control {
+            border-radius: 10px;
+            height: 42px;
+        }
+        .search-card .btn { width: 100%; }
+
+        /* Table enhancements */
+        .table-container {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            background: var(--surface);
+        }
+        table.modern-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: var(--surface);
+        }
+        table.modern-table tbody tr:nth-child(even) td { background: rgba(31, 41, 55, 0.03); }
+        html.dark table.modern-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.03); }
+        table.modern-table tbody tr:hover td { background: rgba(99, 102, 241, 0.06); }
+        table.modern-table td, table.modern-table th { vertical-align: middle; }
+
+        /* Footer */
+        .app-footer {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+    </style>
     {% block head %}
     {% endblock head %}
 </head>
@@ -19,7 +139,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light app-navbar">
                     <div class="container-fluid">
                         <a class="navbar-brand d-flex align-items-center ms-2" href="/">
                             <div class="flex-shrink-0">
@@ -50,13 +170,17 @@
         {% endblock %}
         <div class="row">
             <div class="col">
-                数据更新时间（北京时间）{{ updated }}
+                <div class="page-section app-footer">
+                    数据更新时间（北京时间）{{ updated }}
+                </div>
             </div>
             <div class="col-auto">
-                <a href="https://github.com/hanydd/BSBbrowser">BBSBbrowser</a>移植自
-                <a href="https://github.com/Lartza/SBbrowser">SBbrowser</a>，采用 GPLv3开源协议。使用
-                <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-                协议的<a href="https://bsbsb.top">BilibiliSponsorBlock</a>数据。
+                <div class="page-section app-footer">
+                    <a href="https://github.com/hanydd/BSBbrowser">BBSBbrowser</a>移植自
+                    <a href="https://github.com/Lartza/SBbrowser">SBbrowser</a>，采用 GPLv3开源协议。使用
+                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+                    协议的<a href="https://bsbsb.top">BilibiliSponsorBlock</a>数据。
+                </div>
             </div>
         </div>
     </div>

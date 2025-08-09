@@ -49,7 +49,7 @@ class Lockcategory(models.Model):
 
 class Sponsortime(models.Model):
     videoid = models.TextField(verbose_name='Video ID', db_column='videoID')
-    cid = models.TextField(verbose_name='CID', db_column='cid')
+    # cid = models.TextField(verbose_name='CID', db_column='cid')
     starttime = models.FloatField(verbose_name='Start', db_column='startTime')
     endtime = models.FloatField(verbose_name='End', db_column='endTime')
     votes = models.IntegerField()
