@@ -18,13 +18,13 @@ SOURCE_PRIVATE_DB="${SOURCE_PRIVATE_DB:-privateDB}"
 TARGET_DB="${TARGET_DB:-sponsorblock}"
 TARGET_PRIVATE_DB="${TARGET_PRIVATE_DB:-private_mirror}"
 
-PGHOST="${PGHOST:-192.168.1.3}"
+PGHOST="${PGHOST:-127.0.0.1}"
 PGPORT="${PGPORT:-5432}"
 PGUSER="${PGUSER:-postgres}"
-export PGPASSWORD="${PGPASSWORD:-root}"
+export PGPASSWORD="${PGPASSWORD:-postgres}"
 
 # Set to 1 to also sync privateDB -> TARGET_PRIVATE_DB (same safety rules).
-SYNC_PRIVATE_DB="${SYNC_PRIVATE_DB:-1}"
+SYNC_PRIVATE_DB="${SYNC_PRIVATE_DB:-0}"
 
 # Working directory for dump files (same host; no scp).
 WORKDIR="${WORKDIR:-/tmp/sponsorblock_sync}"
