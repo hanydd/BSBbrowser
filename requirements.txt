@@ -7,3 +7,5 @@ python-dateutil==2.9.0.post0
 timeago==1.0.16
 redis==5.2.1
 hiredis==3.1.0
+gunicorn>=22.0,<23
+whitenoise>=6.7,<7

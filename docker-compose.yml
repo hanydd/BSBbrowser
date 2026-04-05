@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bsb-browser:latest
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    env_file:
+      - .env.docker
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: SBtools.settings.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
