@@ -10,8 +10,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sponsorblock',
-        'USER': 'sponsorblock',
-        'PASSWORD': 'sponsorblock',
+        'USER': 'postgres',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',
     }
 }
