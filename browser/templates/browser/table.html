@@ -3,9 +3,9 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% load l10n %}
-<div id="tableContainer">
+<div id="tableContainer" class="mt-4">
 {% if filter %}
-<div class="page-section">
+<div class="page-section glass glow-border">
     <div class="section-title">条件筛选</div>
     <form action="" method="get" class="row row-cols-auto" id="filterForm">
         {% bootstrap_form filter.form show_label=False %}
