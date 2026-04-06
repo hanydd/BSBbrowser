@@ -283,6 +283,37 @@
         .video-section-links .text-muted {
             font-size: .85rem;
         }
+        .entity-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+            gap: var(--stat-grid-gap);
+        }
+        .entity-link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: var(--stat-tile-pad-y) var(--stat-tile-pad-x);
+            border: 1px solid var(--border);
+            border-radius: var(--stat-tile-radius);
+            background: color-mix(in oklab, var(--surface-2) 92%, transparent);
+            color: var(--text);
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .entity-link-card:hover {
+            color: var(--brand);
+            border-color: color-mix(in oklab, var(--brand) 45%, var(--border));
+            background: color-mix(in oklab, var(--surface) 88%, var(--surface-2));
+        }
+        .entity-link-meta {
+            flex: 0 0 auto;
+            color: var(--muted);
+        }
+        .detail-stack {
+            display: grid;
+            gap: var(--stat-grid-gap);
+        }
 
         /* Search toolbar */
         .search-toolbar {
@@ -479,10 +510,10 @@
             </div>
             <div class="col-auto">
                 <div class="page-section app-footer">
-                    <a href="https://github.com/hanydd/BSBbrowser">BBSBbrowser</a>移植自
+                    <a href="https://github.com/hanydd/BSBbrowser">BSBbrowser</a>移植自
                     <a href="https://github.com/Lartza/SBbrowser">SBbrowser</a>，采用 GPLv3开源协议。使用
                     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
-                    协议的<a href="https://bsbsb.top">BilibiliSponsorBlock</a>数据。
+                    协议的<a href="https://bsbsb.top">小电视空降助手（BilibiliSponsorBlock）</a>数据。
                 </div>
             </div>
         </div>

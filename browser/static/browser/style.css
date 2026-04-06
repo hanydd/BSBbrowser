@@ -48,7 +48,8 @@ table button {
 }
 
 .warning-textarea {
-    width: 600px;
+    width: 100%;
+    max-width: 100%;
     min-height: 20px !important;
     line-height: 20px;
 }

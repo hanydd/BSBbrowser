@@ -6,19 +6,19 @@
 {% endblock head %}
 {% block body %}
     <div class="page-section glass glow-border hero-section">
-        <div class="hero-label">Username</div>
-        <h1 class="hero-title">{{ username }}{% if has_vip_users %}<span class="ms-1" title="Contains VIP users">👑</span>{% endif %}</h1>
+        <div class="hero-label">用户名</div>
+        <h1 class="hero-title">{{ username }}{% if has_vip_users %}<span class="ms-1" title="包含 VIP 用户">👑</span>{% endif %}</h1>
         <div class="hero-meta">
             <div class="hero-meta-item">
                 <span class="hero-icon">👥</span>
-                <span>Unique users</span>
+                <span>关联用户数</span>
                 <span>{{ uniques_count }}</span>
             </div>
             {% if single_userid %}
             <div class="hero-divider"></div>
             <div class="hero-meta-item">
                 <span class="hero-icon">🆔</span>
-                <span>User ID</span>
+                <span>用户 ID</span>
                 <a href="/userid/{{ single_userid }}/">{{ single_userid }}</a>{% if single_userid_is_vip %}<span class="ms-1">👑</span>{% endif %}
             </div>
             {% endif %}
@@ -26,24 +26,47 @@
     </div>
 
     <div class="row layout-row">
-        <div class="col-auto page-section glass glow-border">
-            <ul class="list-group list-group-horizontal">
-                <li class="list-group-item">Username:<br>{{ username }}</li>
-                <li class="list-group-item">Unique users:<br>{{ uniques_count }}</li>
-                <li class="list-group-item">Submissions:<br>{{ user_submissions }}</li>
-                <li class="list-group-item">Ignored submissions: {% include "browser/snippets/stat_info_icon.html" with info_title="Segments that are also not sent to users, but don't count as ignored" %}<br>{{ user_ignored }} ({{ percent_ignored }}%) + {{ user_hidden }}</li>
-                <li class="list-group-item">Views:<br>{{ views }}</li>
-                <li class="list-group-item">Ignored views:<br>{{ ignored_views }} ({{ percent_ignored_views }}%)</li>
-            </ul>
+        <div class="col-12 {% if uniques_count > 1 %}col-lg-7{% endif %} min-w-0">
+            <div class="page-section glass glow-border h-100">
+                <h2 class="section-title">统计信息</h2>
+                <div class="user-stats user-stats--zh">
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">提交数量</div>
+                        <div class="user-stat-value">{{ user_submissions }}</div>
+                    </div>
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">被忽略的提交{% include "browser/snippets/stat_info_icon.html" with info_title="不会推送给用户、且不计入「忽略」的片段数" %}</div>
+                        <div class="user-stat-value">{{ user_ignored }} ({{ percent_ignored }}%) + {{ user_hidden }}</div>
+                    </div>
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">观看</div>
+                        <div class="user-stat-value">{{ views }}</div>
+                    </div>
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">被忽略的观看</div>
+                        <div class="user-stat-value">{{ ignored_views }} ({{ percent_ignored_views }}%)</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-auto page-section glass glow-border">
-            <ul class="list-group">
-            {% for userid in uniques %}
-                {% is_vip userid as vip %}
-                <li class="list-group-item"><a href="/userid/{{ userid }}/">{{ userid }}</a>{% if vip %}<span title="This user is a VIP" class="ms-1">👑</span>{% endif %}</li>
-            {% endfor %}
-            </ul>
+        {% if uniques_count > 1 %}
+        <div class="col-12 col-lg-5 min-w-0">
+            <div class="page-section glass glow-border h-100">
+                <div class="section-head">
+                    <h2 class="section-title">关联用户</h2>
+                </div>
+                <div class="entity-links-grid">
+                {% for userid in unique_userids %}
+                    {% is_vip userid as vip %}
+                    <a class="entity-link-card" href="/userid/{{ userid }}/">
+                        <span>{{ userid }}</span>
+                        {% if vip %}<span class="entity-link-meta" title="该用户为 VIP">👑</span>{% endif %}
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
         </div>
+        {% endif %}
     </div>
     {% include "browser/table.html" %}
 {% endblock body %}

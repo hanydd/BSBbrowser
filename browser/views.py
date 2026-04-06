@@ -91,6 +91,13 @@ def populate_context_video_details(context, videoid):
         context['lockcategories_full'] = lockcategories_full
 
 
+def resolve_username(userid):
+    try:
+        return Username.objects.get(userid=userid).username
+    except Username.DoesNotExist:
+        return None
+
+
 class FilteredSponsortimeListView(SingleTableView):
     table_class = SponsortimeTable
     template_name = 'browser/index.html'
@@ -165,6 +172,7 @@ class FilteredUsernameListView(SingleTableMixin, FilterView):
         context['uniques'] = Username.objects.filter(username=self.username)
         context['uniques_count'] = context['uniques'].count()
         unique_userids = list(context['uniques'].values_list('userid', flat=True))
+        context['unique_userids'] = unique_userids
         context['vip_users_count'] = Vipuser.objects.filter(userid__in=unique_userids).count()
         context['has_vip_users'] = context['vip_users_count'] > 0
         if len(unique_userids) == 1:
@@ -198,10 +206,7 @@ class FilteredUserIDListView(SingleTableMixin, FilterView):
         filter_args = {'user': self.userid}
 
         context['userid'] = self.userid
-        try:
-            context['username'] = Username.objects.get(userid=self.userid).username
-        except Username.DoesNotExist:
-            context['username'] = '—'
+        context['username'] = resolve_username(self.userid)
         context['vip'] = Vipuser.objects.filter(userid=self.userid).exists()
         context['warnings'] = Warnings.objects.filter(userid=self.userid, enabled=1).values_list('reason', flat=True)
 
@@ -233,10 +238,7 @@ class FilteredUUIDListView(SingleTableMixin, FilterView):
         context = super().get_context_data(**kwargs)
 
         filter_args = {'user': self.uuid.user_id}
-        try:
-            context['username'] = self.uuid.user.username
-        except Username.DoesNotExist:
-            context['username'] = '—'
+        context['username'] = resolve_username(self.uuid.user_id)
         context['vip'] = Vipuser.objects.filter(userid=self.uuid.user_id).exists()
 
         context['uuid'] = self.uuid

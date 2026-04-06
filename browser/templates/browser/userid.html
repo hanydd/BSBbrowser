@@ -5,13 +5,13 @@
 {% endblock head %}
 {% block body %}
     <div class="page-section glass glow-border hero-section">
-        <div class="hero-label">User ID</div>
+        <div class="hero-label">用户 ID</div>
         <h1 class="hero-title">{{ userid }}{% if vip %}<span class="ms-1" title="VIP">👑</span>{% endif %}</h1>
         <div class="hero-meta">
             <div class="hero-meta-item">
                 <span class="hero-icon">👤</span>
-                <span>Username</span>
-                {% if username and username != '—' and username != '鈥?' %}
+                <span>用户名</span>
+                {% if username %}
                     <a href="/username/{{ username|urlencode }}/">{{ username }}</a>
                 {% else %}
                     <span>—</span>
@@ -29,12 +29,14 @@
         {% if warnings %}
         <div class="col-12 min-w-0">
             <div class="page-section glass glow-border">
-                <ul class="list-group">
-                    <li class="list-group-item">Active warnings:</li>
+                <div class="section-head">
+                    <h2 class="section-title">生效中的警告</h2>
+                </div>
+                <div class="detail-stack">
                     {% for warning in warnings %}
-                        <li class="list-group-item"><textarea class="form-control warning-textarea" readonly>{{ warning }}</textarea></li>
+                        <textarea class="form-control warning-textarea" readonly>{{ warning }}</textarea>
                     {% endfor %}
-                </ul>
+                </div>
             </div>
         </div>
         {% endif %}

@@ -35,8 +35,7 @@
     <div class="col min-w-0">
         <div class="page-section glass glow-border h-100">
             {% if not submissions %}
-            {% bootstrap_alert 'No submissions exist for this video, check that the Video ID is correct and when the
-            database was last updated.' dismissible=False extra_classes='mb-1' %}
+            {% bootstrap_alert '当前视频还没有片段数据，请确认视频 ID 是否正确，并留意数据库更新时间。' dismissible=False extra_classes='mb-1' %}
             {% endif %}
             <div class="section-head">
                 <h2 class="section-title">视频信息</h2>
