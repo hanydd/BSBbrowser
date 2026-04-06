@@ -3,6 +3,7 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% load l10n %}
+<div id="tableContainer">
 {% if filter %}
 <div class="page-section">
     <div class="section-title">条件筛选</div>
@@ -133,3 +134,4 @@
     {% endblock pagination %}
     <div class="col">Query results: {{ table.rows|length }}</div>
 </div>
+</div>{# end #tableContainer #}
