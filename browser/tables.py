@@ -14,7 +14,7 @@ from .columns import LengthColumn
 class SponsortimeTable(tables.Table):
     videoid = tables.TemplateColumn('<a href="/video/{{ value }}/">{{ value }}</a>'
                                     '<button class="clip" data-value="{{ value }}">✂</button>'
-                                    '<a href="https://www.bilibili.com/video/{{ value }}">Bili</a>', verbose_name=_('视频ID'))
+                                    '<a href="https://www.bilibili.com/video/{{ value }}">小电视</a>', verbose_name=_('视频ID'))
     uuid = tables.TemplateColumn(
         '<div class="cell-grid">'
         '<textarea class="form-control uuid" name="UUID" readonly>{{ value }}</textarea>'

@@ -4,18 +4,22 @@
     <title>UserID | BSB Browser</title>
 {% endblock head %}
 {% block body %}
-    <div class="row mt-2">
-        <div class="col-auto page-section glass glow-border">
-            {% include 'browser/snippets/userid_details.html' %}
+    <div class="row mt-2 g-3">
+        <div class="col-12 min-w-0">
+            <div class="page-section glass glow-border">
+                {% include 'browser/snippets/userid_details.html' %}
+            </div>
         </div>
         {% if warnings %}
-        <div class="col-auto page-section glass glow-border">
-            <ul class="list-group">
-                <li class="list-group-item">Active warnings:</li>
-                {% for warning in warnings %}
-                    <li class="list-group-item"><textarea class="form-control warning-textarea" readonly>{{ warning }}</textarea></li>
-                {% endfor %}
-            </ul>
+        <div class="col-12 min-w-0">
+            <div class="page-section glass glow-border">
+                <ul class="list-group">
+                    <li class="list-group-item">Active warnings:</li>
+                    {% for warning in warnings %}
+                        <li class="list-group-item"><textarea class="form-control warning-textarea" readonly>{{ warning }}</textarea></li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
         {% endif %}
     </div>

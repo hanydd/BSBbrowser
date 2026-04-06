@@ -1,7 +1,22 @@
-<ul class="list-group list-group-horizontal">
-    <li class="list-group-item">Username:<br>{% if username != "—" %}<a href="/username/{{ username|urlencode }}/">{{ username }}</a>{% else %}{{ username }}{% endif %}{% if vip %}<span title="This user is a VIP" class="badge bg-secondary ms-1">👑</span>{% endif %}</li>
-    <li class="list-group-item">Submissions:<br>{{ user_submissions }}</li>
-    <li class="list-group-item">Ignored submissions:<br>{{ user_ignored }} ({{ percent_ignored }}%) <span title="Segments that are also not sent to users, but don't count as ignored">+ {{ user_hidden }} ❓</span></li>
-    <li class="list-group-item">Views:<br>{{ views }}</li>
-    <li class="list-group-item">Ignored views:<br>{{ ignored_views }} ({{ percent_ignored_views }}%)</li>
-</ul>
+<div class="user-stats user-stats--zh">
+    <div class="user-stat-tile">
+        <div class="user-stat-label">用户名</div>
+        <div class="user-stat-value">{% if username != "—" %}<a href="/username/{{ username|urlencode }}/">{{ username }}</a>{% else %}{{ username }}{% endif %}{% if vip %}<span title="该用户为 VIP" class="badge bg-secondary ms-1">👑</span>{% endif %}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">投稿数</div>
+        <div class="user-stat-value">{{ user_submissions }}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">忽略投稿</div>
+        <div class="user-stat-value">{{ user_ignored }} ({{ percent_ignored }}%) <span title="不会推送给用户、且不计入「忽略」的片段数">+ {{ user_hidden }} ❓</span></div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">观看</div>
+        <div class="user-stat-value">{{ views }}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">忽略观看</div>
+        <div class="user-stat-value">{{ ignored_views }} ({{ percent_ignored_views }}%)</div>
+    </div>
+</div>

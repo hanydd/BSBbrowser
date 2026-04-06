@@ -1,0 +1,11 @@
+---
+description: User-facing copy avoids B trademark; use 小电视 for third-party video site references
+alwaysApply: true
+---
+
+# 品牌与措辞（BSBbrowser）
+
+面向用户的文案中**不要**使用 “bilibili”“哔哩哔哩”“B 站”等可能涉及商标的称呼；凡原意指该站或站外视频页，统一写作 **「小电视」**。
+
+- 链接、iframe 等技术上的 URL 可仍指向既有域名；**可见文字、标题、表格链接文案**须遵守上述用词。
+- 项目名或数据出处若需指代 BS 生态的 SponsorBlock 数据，可用 **「小电视 SponsorBlock」** 等不含上述禁用词的组合。

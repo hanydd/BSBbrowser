@@ -1,25 +1,40 @@
-<li class="list-group-item">Submissions: {{ submissions }}</li>
-<li class="list-group-item">Ignored: {{ ignored }} <span title="Segments that are also not sent to users, but don't count as ignored">+ {{ hidden }} ❓</span></li>
-<li class="list-group-item">Locked skips: {% if lockcategories_skip %}
-        {% for lock in lockcategories_skip %}
-            <span title="{{ lock.reason }}">{{ lock.category }}</span>
-        {% endfor %}
-    {% else %}
-        <span>—</span>
-    {% endif %}
-</li>
-<li class="list-group-item">Locked mutes: {% if lockcategories_mute %}
-        {% for lock in lockcategories_mute %}
-            <span title="{{ lock.reason }}">{{ lock.category }}</span>
-        {% endfor %}
-    {% else %}
-        <span>—</span>
-    {% endif %}</li>
-<li class="list-group-item">Locked full: {% if lockcategories_full %}
-        {% for lock in lockcategories_full %}
-            <span title="{{ lock.reason }}">{{ lock.category }}</span>
-        {% endfor %}
-    {% else %}
-        <span>—</span>
-    {% endif %}
-</li>
+<div class="user-stats video-stats">
+    <div class="user-stat-tile">
+        <div class="user-stat-label">投稿数</div>
+        <div class="user-stat-value">{{ submissions }}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">忽略</div>
+        <div class="user-stat-value">{{ ignored }} <span title="不会推送给用户、且不计入「忽略」的片段数">+ {{ hidden }} ❓</span></div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">被锁定的跳过片段</div>
+        <div class="user-stat-value">{% if lockcategories_skip %}
+            {% for lock in lockcategories_skip %}
+                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+            {% endfor %}
+        {% else %}
+            <span>—</span>
+        {% endif %}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">被锁定的静音片段</div>
+        <div class="user-stat-value">{% if lockcategories_mute %}
+            {% for lock in lockcategories_mute %}
+                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+            {% endfor %}
+        {% else %}
+            <span>—</span>
+        {% endif %}</div>
+    </div>
+    <div class="user-stat-tile">
+        <div class="user-stat-label">被锁定的全视频标签</div>
+        <div class="user-stat-value">{% if lockcategories_full %}
+            {% for lock in lockcategories_full %}
+                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+            {% endfor %}
+        {% else %}
+            <span>—</span>
+        {% endif %}</div>
+    </div>
+</div>
