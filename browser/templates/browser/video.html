@@ -23,13 +23,32 @@
         line-height: 1.35;
         margin: 0;
         letter-spacing: .01em;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5rem 0.75rem;
+    }
+    .hero-title .hero-external-link {
+        font-size: .85rem;
+        font-weight: 600;
+        font-family: inherit;
+        color: var(--brand);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .hero-title .hero-external-link:hover {
+        color: var(--brand-2);
+        text-decoration: underline;
     }
 </style>
 {% endblock head %}
 {% block body %}
 <div class="page-section glass glow-border hero-section">
     <div class="hero-label">视频</div>
-    <h1 class="hero-title">{{ videoid }}</h1>
+    <h1 class="hero-title">
+        <span>{{ videoid }}</span>
+        <a class="hero-external-link" href="https://www.bilibili.com/video/{{ videoid }}" target="_blank" rel="noopener noreferrer">小电视</a>
+    </h1>
 </div>
 <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-4">
@@ -51,9 +70,6 @@
                 <h2 class="section-title">视频信息</h2>
             </div>
             {% include "browser/snippets/videodetails.html" %}
-            <div class="video-section-links">
-                <a href="https://www.bilibili.com/video/{{ videoid }}">小电视 🔗</a>
-            </div>
         </div>
     </div>
 </div>
