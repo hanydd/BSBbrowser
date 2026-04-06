@@ -1,17 +1,18 @@
+{% load browser_extras %}
 <div class="user-stats video-stats">
     <div class="user-stat-tile">
         <div class="user-stat-label">提交数量</div>
         <div class="user-stat-value">{{ submissions }}</div>
     </div>
     <div class="user-stat-tile">
-        <div class="user-stat-label">忽略{% include "browser/snippets/stat_info_icon.html" with info_title="不会推送给用户、且不计入「忽略」的片段数" %}</div>
+        <div class="user-stat-label">忽略{% include "browser/snippets/stat_info_icon.html" with info_title="不会推送给用户、且不计入“忽略”的片段数量" %}</div>
         <div class="user-stat-value">{{ ignored }} + {{ hidden }}</div>
     </div>
     <div class="user-stat-tile">
         <div class="user-stat-label">被锁定的跳过片段</div>
         <div class="user-stat-value">{% if lockcategories_skip %}
             {% for lock in lockcategories_skip %}
-                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+                <span title="{{ lock.reason }}">{{ lock.category|category_label }}</span>{% if not forloop.last %} · {% endif %}
             {% endfor %}
         {% else %}
             <span>—</span>
@@ -21,7 +22,7 @@
         <div class="user-stat-label">被锁定的静音片段</div>
         <div class="user-stat-value">{% if lockcategories_mute %}
             {% for lock in lockcategories_mute %}
-                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+                <span title="{{ lock.reason }}">{{ lock.category|category_label }}</span>{% if not forloop.last %} · {% endif %}
             {% endfor %}
         {% else %}
             <span>—</span>
@@ -31,7 +32,7 @@
         <div class="user-stat-label">被锁定的全视频标签</div>
         <div class="user-stat-value">{% if lockcategories_full %}
             {% for lock in lockcategories_full %}
-                <span title="{{ lock.reason }}">{{ lock.category }}</span>{% if not forloop.last %} · {% endif %}
+                <span title="{{ lock.reason }}">{{ lock.category|category_label }}</span>{% if not forloop.last %} · {% endif %}
             {% endfor %}
         {% else %}
             <span>—</span>

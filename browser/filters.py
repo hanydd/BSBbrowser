@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.widgets import RangeWidget
 
 from .models import Sponsortime
+from .category_labels import CATEGORY_LABELS
 
 FIELDS = ['videoid', 'votes', 'views', 'category', 'shadowhidden', 'uuid', 'username', 'user']
 
@@ -25,12 +26,19 @@ class UserIDFilter(FilterSet):
     views = RangeFilter(label=_('观看'), widget=CustomRangeWidget(attrs={'type': 'number', 'step': 1},
                                                  from_attrs={'placeholder': _('观看下限')},
                                                  to_attrs={'placeholder': _('观看上限')}))
-    category = MultipleChoiceFilter(choices=(('exclusive_access', 'Exclusive Access'),
-                                             ('filler', 'Filler'), ('poi_highlight', 'Highlight'),
-                                             ('interaction', 'Interaction'), ('intro', 'Intro'),
-                                             ('music_offtopic', 'Non-Music'), ('outro', 'Outro'),
-                                             ('preview', 'Preview'), ('selfpromo', 'Selfpromo'),
-                                             ('sponsor', 'Sponsor'),), distinct=False)
+    category = MultipleChoiceFilter(choices=(
+        ('sponsor', CATEGORY_LABELS['sponsor']),
+        ('selfpromo', CATEGORY_LABELS['selfpromo']),
+        ('exclusive_access', CATEGORY_LABELS['exclusive_access']),
+        ('interaction', CATEGORY_LABELS['interaction']),
+        ('poi_highlight', CATEGORY_LABELS['poi_highlight']),
+        ('intro', CATEGORY_LABELS['intro']),
+        ('outro', CATEGORY_LABELS['outro']),
+        ('preview', CATEGORY_LABELS['preview']),
+        ('padding', CATEGORY_LABELS['padding']),
+        ('filler', CATEGORY_LABELS['filler']),
+        ('music_offtopic', CATEGORY_LABELS['music_offtopic']),
+    ), distinct=False)
     category.always_filter = False
     shadowhidden = ChoiceFilter(label=_('伪隐藏'), choices=((0, _('否')), (1, _('是'))), empty_label=_('伪隐藏'),
                                 method='shadowhidden_filter')

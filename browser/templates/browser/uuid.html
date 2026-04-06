@@ -1,5 +1,6 @@
 {# SPDX-License-Identifier: AGPL-3.0-or-later #}
 {% extends "browser/base.html" %}
+{% load browser_extras %}
 {% block head %}
     <title>{{ uuid.uuid }} | BSB Browser</title>
     <style>
@@ -80,7 +81,7 @@
                     </div>
                     <div class="user-stat-tile user-stat-tile--span-2">
                         <div class="user-stat-label">片段时间</div>
-                        <div class="user-stat-value">{{ starttime }}–{{ endtime }} ({{ length }}) {{ actiontype }} {{ uuid.category }}{% if uuid.category == 'chapter' and uuid.description %} · {{ uuid.description }}{% endif %}</div>
+                        <div class="user-stat-value">{{ starttime }}–{{ endtime }} ({{ length }}) {{ actiontype }} {{ uuid.category|category_label }}{% if uuid.category == 'chapter' and uuid.description %} · {{ uuid.description }}{% endif %}</div>
                     </div>
                     <div class="user-stat-tile user-stat-tile--span-2">
                         <div class="uuid-segment-numeric-row">

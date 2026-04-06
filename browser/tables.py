@@ -9,6 +9,7 @@ import django_tables2 as tables
 
 from .models import Sponsortime, Vipuser
 from .columns import LengthColumn
+from .category_labels import category_label
 
 
 class SponsortimeTable(tables.Table):
@@ -125,9 +126,10 @@ class SponsortimeTable(tables.Table):
 
     @staticmethod
     def render_category(value: str, record) -> str:
+        label = category_label(value)
         if record.description:
-            return format_html('<span title="{}">{}</span>', record.description, value)
-        return value
+            return format_html('<span title="{}">{}</span>', record.description, label)
+        return label
 
     @staticmethod
     def order_username(queryset: QuerySet, is_descending: bool) -> tuple[QuerySet, bool]:
