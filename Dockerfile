@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # SPDX-License-Identifier: AGPL-3.0-or-later
 FROM python:3.12-slim-bookworm
 
@@ -17,7 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --retries=10 -r requirements.txt
 
-COPY . .
+COPY manage.py ./
+COPY docker-entrypoint.sh ./
+COPY browser ./browser
+COPY SBtools ./SBtools
 RUN chmod +x docker-entrypoint.sh \
     && sed -i 's/\r$//' docker-entrypoint.sh
 

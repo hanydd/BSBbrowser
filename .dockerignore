@@ -1,5 +1,9 @@
 .git
+.github
+.cursor
 .idea
+.venv
+.vscode
 venv
 __pycache__
 *.py[cod]
@@ -7,3 +11,5 @@ __pycache__
 .env
 .env.*
 !.env.docker.example
+docs
+export
