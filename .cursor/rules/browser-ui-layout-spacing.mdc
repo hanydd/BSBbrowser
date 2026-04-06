@@ -1,0 +1,46 @@
+---
+description: BSBbrowser 大卡片与主布局留白标准（CSS 变量 + layout-row，禁止随意 mt/g）
+globs: browser/templates/**/*.html
+alwaysApply: false
+---
+
+# UI：大卡片与布局留白（BSBbrowser）
+
+**唯一来源**：`browser/templates/browser/base.html` 内 `<style>` 的 `:root` 与相关选择器。改密度时只调变量，勿在页面里用 Bootstrap 的 `mt-*` / `mb-*` / `g-*` 拼「大块」间距。
+
+## CSS 变量（语义）
+
+| 变量 | 用途 |
+|------|------|
+| `--page-section-pad-y` / `--page-section-pad-x` | **大卡片**（`.page-section`、`.hero-section`）内边距 |
+| `--page-section-mb` | 大卡片下外边距（块与块之间） |
+| `--page-section-radius` | 大卡片圆角 |
+| `--layout-stack-gap` | 与 `--page-section-mb` 同值；用于 `.hero-section` 下边距等需与大卡对齐处 |
+| `--section-title-mb` / `--section-head-mb` | 区块标题与内容之间 |
+| `--stat-grid-gap` | 统计网格列/行间距；主布局行 `.row.layout-row` 的 gutter 也用它 |
+| `--stat-tile-pad-*` / `--stat-tile-radius` / `--stat-label-mb` | **内层小卡**（`.user-stats .user-stat-tile`） |
+| `--table-wrap-pad` | `.table-container` 内边距 |
+
+## 必须遵守
+
+1. **主布局多列/多行**：用 `class="row layout-row"`，不要用 `g-2` / `g-3` 当全局标准。
+2. **行间距**：由 `.row.layout-row` 的 **`margin-bottom: var(--layout-stack-gap)`** 承担。行内 `.page-section` 的 `margin-bottom` 被全局规则 `.row.layout-row .page-section { margin-bottom: 0 }` 抑制——因为 `.page-section.h-100` 在 flex 列里，其 `margin-bottom` 不会溢出到行外，只会撑高列本身，不产生行间间距。
+3. **表格区**：`#tableContainer` **不要**单独设 `margin-top`；上方 `.row.layout-row` 的 `margin-bottom` 已提供间距。
+4. **顶栏 hero**（`.hero-section`）：内边距对齐 `--page-section-pad-*`，下边距对齐 `--layout-stack-gap`。
+5. **独立 `.page-section`**（不在 `layout-row` 里的，如页脚）：仍保留自身 `margin-bottom: var(--page-section-mb)`。
+
+## 反例
+
+```html
+<!-- ❌ 大块间距用 Bootstrap 魔法数 -->
+<div class="row g-2 mt-2 mb-2">...</div>
+<div id="tableContainer" class="mt-3">...</div>
+
+<!-- ✅ 交给全局变量与 layout-row -->
+<div class="row layout-row">...</div>
+<div id="tableContainer">...</div>
+```
+
+## 面向用户文案
+
+仍遵守项目 **品牌与措辞** 规则（如「小电视」）；本规则只管**间距与结构类名**。

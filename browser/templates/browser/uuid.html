@@ -3,59 +3,8 @@
 {% block head %}
     <title>{{ uuid.uuid }} | BSB Browser</title>
     <style>
-        .hero-section {
-            padding: 20px 24px 18px;
-            margin-bottom: 18px;
-        }
-        .hero-label {
-            font-size: .78rem;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--muted);
-            margin-bottom: 6px;
-        }
-        .hero-title {
-            font-size: clamp(1.1rem, 3vw, 1.6rem);
-            font-weight: 700;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            word-break: break-all;
-            line-height: 1.35;
-            margin: 0 0 14px;
-            letter-spacing: .01em;
-        }
-        .hero-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 20px;
-            align-items: center;
-        }
-        .hero-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: .88rem;
-            color: var(--muted);
-        }
-        .hero-meta-item .hero-icon {
-            font-size: .8rem;
-            opacity: .7;
-        }
-        .hero-meta-item a {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-            font-size: .85rem;
-            color: var(--brand);
-            text-decoration: none;
-            word-break: break-all;
-        }
-        .hero-meta-item a:hover {
-            color: var(--brand-2);
-            text-decoration: underline;
-        }
-        .hero-divider {
-            width: 1px;
-            height: 1rem;
-            background: var(--border);
-            display: inline-block;
+        .uuid-hero .hero-title {
+            margin: 0 0 8px;
         }
         /* 片段信息：与视频/用户统计卡一致，每行最多两列；长字段占满一行 */
         .user-stats.uuid-segment-stats {
@@ -71,7 +20,7 @@
         .uuid-segment-numeric-row {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px 12px;
+            gap: 8px;
             align-items: start;
         }
         .uuid-segment-numeric-row .user-stat-label {
@@ -91,7 +40,7 @@
     </style>
 {% endblock head %}
 {% block body %}
-    <div class="page-section glass glow-border hero-section">
+    <div class="page-section glass glow-border hero-section uuid-hero">
         <div class="hero-label">片段</div>
         <h1 class="hero-title">{{ uuid.uuid }}</h1>
         <div class="hero-meta">
@@ -109,7 +58,7 @@
         </div>
     </div>
 
-    <div class="row g-3">
+    <div class="row layout-row">
         <div class="col-12 col-md-6 col-lg-5">
             <div class="page-section glass glow-border h-100">
                 <div class="ratio ratio-16x9">
@@ -161,7 +110,7 @@
             </div>
         </div>
     </div>
-    <div class="row g-3 mb-4">
+    <div class="row layout-row">
         <div class="col-12 col-lg-6">
             <div class="page-section glass glow-border h-100">
                 <div class="section-head">

@@ -4,53 +4,25 @@
 {% block head %}
 <title>{{ videoid }} | BSB Browser</title>
 <style>
-    .hero-section {
-        padding: 20px 24px 18px;
-        margin-bottom: 18px;
-    }
-    .hero-label {
-        font-size: .78rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: var(--muted);
-        margin-bottom: 6px;
-    }
-    .hero-title {
-        font-size: clamp(1.1rem, 3vw, 1.6rem);
-        font-weight: 700;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        word-break: break-all;
-        line-height: 1.35;
+    /* 标题行内放「小电视」链接 */
+    .video-hero .hero-title {
         margin: 0;
-        letter-spacing: .01em;
         display: flex;
         flex-wrap: wrap;
         align-items: baseline;
-        gap: 0.5rem 0.75rem;
-    }
-    .hero-title .hero-external-link {
-        font-size: .85rem;
-        font-weight: 600;
-        font-family: inherit;
-        color: var(--brand);
-        text-decoration: none;
-        white-space: nowrap;
-    }
-    .hero-title .hero-external-link:hover {
-        color: var(--brand-2);
-        text-decoration: underline;
+        gap: 0.45rem 0.65rem;
     }
 </style>
 {% endblock head %}
 {% block body %}
-<div class="page-section glass glow-border hero-section">
+<div class="page-section glass glow-border hero-section video-hero">
     <div class="hero-label">视频</div>
     <h1 class="hero-title">
         <span>{{ videoid }}</span>
         <a class="hero-external-link" href="https://www.bilibili.com/video/{{ videoid }}" target="_blank" rel="noopener noreferrer">小电视</a>
     </h1>
 </div>
-<div class="row g-3">
+<div class="row layout-row">
     <div class="col-12 col-md-6 col-lg-4">
         <div class="page-section glass glow-border h-100">
             <div class="ratio ratio-16x9">
