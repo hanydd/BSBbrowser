@@ -147,6 +147,38 @@
             text-transform: none;
             letter-spacing: 0.04em;
         }
+        /* 统计旁说明：小号圆圈内 i，替代问号 */
+        .stat-info-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.2em;
+            vertical-align: 0.15em;
+            color: var(--muted);
+            cursor: help;
+            line-height: 0;
+        }
+        .stat-info-hint svg {
+            width: 0.72em;
+            height: 0.72em;
+            min-width: 12px;
+            min-height: 12px;
+            opacity: 0.88;
+        }
+        .stat-info-hint:hover {
+            color: var(--brand);
+        }
+        .user-stat-label .stat-info-hint {
+            margin-left: 0.3em;
+            vertical-align: 0.1em;
+        }
+
+        /* 视频信息：宽屏时避免五张卡片挤成一行，至少两行（如 3+2） */
+        @media (min-width: 992px) {
+            .user-stats.video-stats {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
 
         .video-section-links {
             margin-top: 12px;

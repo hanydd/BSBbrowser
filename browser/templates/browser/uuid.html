@@ -57,6 +57,37 @@
             background: var(--border);
             display: inline-block;
         }
+        /* 片段信息：与视频/用户统计卡一致，每行最多两列；长字段占满一行 */
+        .user-stats.uuid-segment-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .user-stats.uuid-segment-stats .user-stat-label {
+            text-transform: none;
+            letter-spacing: 0.04em;
+        }
+        .user-stats.uuid-segment-stats .user-stat-tile--span-2 {
+            grid-column: 1 / -1;
+        }
+        .uuid-segment-numeric-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px 12px;
+            align-items: start;
+        }
+        .uuid-segment-numeric-row .user-stat-label {
+            margin-bottom: 4px;
+        }
+        @media (max-width: 575.98px) {
+            .user-stats.uuid-segment-stats {
+                grid-template-columns: 1fr;
+            }
+            .user-stats.uuid-segment-stats .user-stat-tile--span-2 {
+                grid-column: auto;
+            }
+            .uuid-segment-numeric-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
     </style>
 {% endblock head %}
 {% block body %}
@@ -79,22 +110,54 @@
     </div>
 
     <div class="row g-3">
-        <div class="col-12 col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-5">
             <div class="page-section glass glow-border h-100">
                 <div class="ratio ratio-16x9">
                     <iframe src="//player.bilibili.com/player.html?isOutside=true&bvid={{ videoid }}" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
                 </div>
             </div>
         </div>
-        <div class="col min-w-0">
+        <div class="col-12 col-md-6 col-lg-7 min-w-0">
             <div class="page-section glass glow-border h-100">
-                <ul class="list-group">
-                    <li class="list-group-item">提交时间：{{ submitted }}</li>
-                    <li class="list-group-item">片段时间：{{ starttime }}–{{ endtime }} ({{ length }}) {{ actiontype }} {{ uuid.category }}{% if uuid.category == 'chapter' and uuid.description %} · {{ uuid.description }}{% endif %}</li>
-                    <li class="list-group-item">票数：{{ votes }} &nbsp; 浏览：{{ uuid.views }}</li>
-                    <li class="list-group-item">视频时长：{{ duration }} &nbsp; 隐藏：{{ uuid_hidden }} &nbsp; 伪隐藏：{{ shadowhidden }}</li>
-                    <li class="list-group-item">User Agent：{% if uuid.useragent %}{{ uuid.useragent }}{% else %}—{% endif %}</li>
-                </ul>
+                <h2 class="section-title">片段信息</h2>
+                <div class="user-stats uuid-segment-stats">
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">提交时间</div>
+                        <div class="user-stat-value">{{ submitted }}</div>
+                    </div>
+                    <div class="user-stat-tile">
+                        <div class="user-stat-label">视频时长</div>
+                        <div class="user-stat-value">{{ duration }}</div>
+                    </div>
+                    <div class="user-stat-tile user-stat-tile--span-2">
+                        <div class="user-stat-label">片段时间</div>
+                        <div class="user-stat-value">{{ starttime }}–{{ endtime }} ({{ length }}) {{ actiontype }} {{ uuid.category }}{% if uuid.category == 'chapter' and uuid.description %} · {{ uuid.description }}{% endif %}</div>
+                    </div>
+                    <div class="user-stat-tile user-stat-tile--span-2">
+                        <div class="uuid-segment-numeric-row">
+                            <div>
+                                <div class="user-stat-label">票数</div>
+                                <div class="user-stat-value">{{ votes }}</div>
+                            </div>
+                            <div>
+                                <div class="user-stat-label">浏览</div>
+                                <div class="user-stat-value">{{ uuid.views }}</div>
+                            </div>
+                            <div>
+                                <div class="user-stat-label">隐藏</div>
+                                <div class="user-stat-value">{{ uuid_hidden }}</div>
+                            </div>
+                            <div>
+                                <div class="user-stat-label">伪隐藏</div>
+                                <div class="user-stat-value">{{ shadowhidden }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-stat-tile user-stat-tile--span-2">
+                        <div class="user-stat-label">User Agent</div>
+                        <div class="user-stat-value">{% if uuid.useragent %}{{ uuid.useragent }}{% else %}—{% endif %}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -4,12 +4,12 @@
         <div class="user-stat-value">{% if username != "—" %}<a href="/username/{{ username|urlencode }}/">{{ username }}</a>{% else %}{{ username }}{% endif %}{% if vip %}<span title="该用户为 VIP" class="badge bg-secondary ms-1">👑</span>{% endif %}</div>
     </div>
     <div class="user-stat-tile">
-        <div class="user-stat-label">投稿数</div>
+        <div class="user-stat-label">提交数量</div>
         <div class="user-stat-value">{{ user_submissions }}</div>
     </div>
     <div class="user-stat-tile">
-        <div class="user-stat-label">忽略投稿</div>
-        <div class="user-stat-value">{{ user_ignored }} ({{ percent_ignored }}%) <span title="不会推送给用户、且不计入「忽略」的片段数">+ {{ user_hidden }} ❓</span></div>
+        <div class="user-stat-label">忽略投稿{% include "browser/snippets/stat_info_icon.html" with info_title="不会推送给用户、且不计入「忽略」的片段数" %}</div>
+        <div class="user-stat-value">{{ user_ignored }} ({{ percent_ignored }}%) + {{ user_hidden }}</div>
     </div>
     <div class="user-stat-tile">
         <div class="user-stat-label">观看</div>

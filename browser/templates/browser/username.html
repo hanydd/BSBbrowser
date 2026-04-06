@@ -11,7 +11,7 @@
                 <li class="list-group-item">Username:<br>{{ username }}</li>
                 <li class="list-group-item">Unique users:<br>{{ uniques_count }}</li>
                 <li class="list-group-item">Submissions:<br>{{ user_submissions }}</li>
-                <li class="list-group-item">Ignored submissions:<br>{{ user_ignored }} ({{ percent_ignored }}%) <span title="Segments that are also not sent to users, but don't count as ignored">+ {{ user_hidden }} ❓</span></li>
+                <li class="list-group-item">Ignored submissions: {% include "browser/snippets/stat_info_icon.html" with info_title="Segments that are also not sent to users, but don't count as ignored" %}<br>{{ user_ignored }} ({{ percent_ignored }}%) + {{ user_hidden }}</li>
                 <li class="list-group-item">Views:<br>{{ views }}</li>
                 <li class="list-group-item">Ignored views:<br>{{ ignored_views }} ({{ percent_ignored_views }}%)</li>
             </ul>
