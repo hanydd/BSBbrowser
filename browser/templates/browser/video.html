@@ -3,8 +3,34 @@
 {% load django_bootstrap5 %}
 {% block head %}
 <title>{{ videoid }} | BSB Browser</title>
+<style>
+    .hero-section {
+        padding: 20px 24px 18px;
+        margin-bottom: 18px;
+    }
+    .hero-label {
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+    .hero-title {
+        font-size: clamp(1.1rem, 3vw, 1.6rem);
+        font-weight: 700;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        word-break: break-all;
+        line-height: 1.35;
+        margin: 0;
+        letter-spacing: .01em;
+    }
+</style>
 {% endblock head %}
 {% block body %}
+<div class="page-section glass glow-border hero-section">
+    <div class="hero-label">视频</div>
+    <h1 class="hero-title">{{ videoid }}</h1>
+</div>
 <div class="row g-3">
     <div class="col-12 col-md-6 col-lg-4">
         <div class="page-section glass glow-border h-100">
