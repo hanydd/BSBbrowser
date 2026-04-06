@@ -133,6 +133,13 @@
         .page-section form .form-control { transition: background .2s ease, border-color .2s ease, box-shadow .2s ease; }
         .page-section form .form-control:hover, .page-section form .form-control:focus { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(99,102,241,.2); }
 
+        /* Filter form: reserve the same right padding Bootstrap uses for .is-valid on every field so
+           width stays fixed while the check / error icons still show */
+        #filterForm input.form-control,
+        #filterForm textarea.form-control {
+            padding-right: calc(1.5em + 0.75rem);
+        }
+
         /* Table enhancements */
         .table-container { overflow: hidden; }
         .table-container:hover { transform: none; box-shadow: var(--shadow); }
