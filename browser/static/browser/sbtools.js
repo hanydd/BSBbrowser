@@ -62,11 +62,23 @@ document.addEventListener('click', function (e) {
 
 // ---------------------------------------------------------------------------
 // Pagination & sort links inside #tableContainer (event delegation so it
-// keeps working after every swap)
+// keeps working after every swap). We intentionally do NOT intercept
+// row detail links (.cell-link), so those still do a full-page navigation.
 // ---------------------------------------------------------------------------
 document.addEventListener('click', function (e) {
     const link = e.target.closest('#tableContainer a');
     if (!link) return;
+
+    const isPaginationLink =
+        link.classList.contains('page-link') &&
+        Boolean(link.closest('.pagination')) &&
+        Boolean(link.getAttribute('href'));
+    const isSortLink =
+        Boolean(link.closest('thead th')) &&
+        Boolean(link.getAttribute('href'));
+
+    if (!isPaginationLink && !isSortLink) return;
+
     e.preventDefault();
     history.pushState(null, '', link.href);
     fetchTable(link.href);
