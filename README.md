@@ -1,47 +1,89 @@
-# SBTools
-SBTools is a Django web service for browsing the SponsorBlock database (https://sponsor.ajay.app/).  
-The project is tested to work on Python 3.8.
+# BSB browser
 
-There is a publicly hosted instance of this service at https://sb.ltn.fi/
+BSB browser，全称 BilibiliSponsorBlock Browser，是一个基于 Django 的
+Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 
-## Installation & Usage
+当前仓库面向 BilibiliSponsorBlock 的使用场景，提供片段、视频、用户和 UUID
+详情页，并集成了跳转 Bilibili 页面、嵌入播放器、本地开发配置和 Docker 部署方案。
 
-To install the requirements on Linux, `psycopg2` needs to be compiled. pip does this automatically if build requirements are available. https://www.psycopg.org/docs/install.html#build-prerequisites
+## 项目功能
 
-An alternative to building is to use `psycopg2-binary`. You can edit requirements.txt or install it manually if you can't or don't want to build.   
-The binary version is not recommended for production by psycopg2 developers and could in certain situations lead to problems, which is why we default to building. https://www.psycopg.org/docs/install.html#psycopg-vs-psycopg-binary
+- 在首页浏览最近提交的片段
+- 按视频 ID 或视频链接、用户名、用户公开 ID、片段 UUID 进行搜索
+- 查看视频、用户、片段维度的统计信息
+- 按投票数、播放量、分类、动作类型、伪隐藏状态筛选表格数据
+- 从详情页直接跳转到对应的 Bilibili 页面或播放器
 
-### Development
-For development you can clone the repo, install requirements.txt (in a venv preferably) and run the Django development server with `(venv) python manage.py runserver`.
+## 技术栈
 
-Database should still be migrated to PostgreSQL (e.g. `pgloader database.db postgresql://sponsorblock@localhost/sponsorblock`) and modified with `INSERT INTO config VALUES ('updated', now());` or similar.  
-Database connection details are configured in SBtools/settings/development.py  
-The SECRET_KEY doesn't need changing necessarily.
+- Python 3.12
+- Django 5.1
+- PostgreSQL
+- Redis
+- Gunicorn
+- WhiteNoise
 
-### Production
-There are helpful files under docs/ for deploying the service.
+## 数据要求
 
-All examples assume a Linux user `sponsorblock` with home folder at `/srv/sponsorblock/`
-and proxying the site through Nginx with webroot at `/srv/http/sbtools/`
+本项目本身不负责创建 SponsorBlock 的数据库结构。当前 Django 模型均使用
+`managed = False`，因此运行前需要准备一个已经存在的 PostgreSQL 数据库，
+其中至少应包含以下表：
 
-You should also have a PostgreSQL user `sponsorblock` with a database called `sponsorblock`.  
-Based on brief testing, using the SQLite database has abysmal performance.
+- `sponsorTimes`
+- `userNames`
+- `vipUsers`
+- `warnings`
+- `lockCategories`
+- `config`
 
-Installing before running could look like the following
+其中 `config` 表中还应包含 `updated` 这一项，用于在页面中显示数据最后更新时间。
 
-```bash
-[sponsorblock]$ git clone https://github.com/Lartza/SBbrowser.git
-[sponsorblock]$ python -m venv /srv/sponsorblock/SBbrowser/venv
-[sponsorblock]$ /srv/sponsorblock/SBbrowser/venv/bin/pip install -r /srv/sponsorblock/SBbrowser/requirements.txt
-[sponsorblock]$ /srv/sponsorblock/SBbrowser/venv/bin/pip install gunicorn
-[sponsorblock]$ DB_PASSWORD='changeme' SECRET_KEY='changeme' STATIC_ROOT='/srv/http/sbtools/static/' DJANGO_SETTINGS_MODULE='SBtools.settings.production' /srv/sponsorblock/SBbrowser/venv/bin/python /srv/sponsorblock/SBbrowser/manage.py collectstatic --noinput
-```
+## 本地开发
 
-The DB_PASSWORD, SECRET_KEY and STATIC_ROOT variables are also present in files under docs/ and should be modified as needed.  
-SECRET_KEY should be a large random value and kept secret. You could generate one on https://djecrety.ir/
+1. 创建并激活虚拟环境
+2. 安装依赖：`pip install -r requirements.txt`
+3. 确保 PostgreSQL 和 Redis 可用
+4. 根据本地环境修改 [`SBtools/settings/development.py`](SBtools/settings/development.py)
+5. 启动开发服务器：`python manage.py runserver`
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+默认情况下，[`manage.py`](manage.py) 会使用 `SBtools.settings.development`。
 
-## License
-[AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)
+## Docker 部署
+
+仓库内已经包含可直接使用的 Docker 部署配置。
+
+1. 复制 `.env.docker.example` 为 `.env.docker`
+2. 根据实际环境填写 `SECRET_KEY`、`DB_PASSWORD` 以及 PostgreSQL / Redis 相关配置
+3. 执行 `docker compose up --build -d`
+
+需要注意：
+
+- 容器默认使用 `SBtools.settings.docker`
+- [`docker-entrypoint.sh`](docker-entrypoint.sh) 会先执行 `python manage.py migrate --noinput`，然后启动 Gunicorn
+- 默认配置下，容器会通过 `host.docker.internal` 连接宿主机上的 PostgreSQL 和 Redis
+- 静态文件会在镜像构建阶段收集到 `/app/staticfiles`，并由 WhiteNoise 提供服务
+
+相关文件：
+
+- [`.env.docker.example`](.env.docker.example)
+- [`docker-compose.yml`](docker-compose.yml)
+- [`Dockerfile`](Dockerfile)
+- [`docker-entrypoint.sh`](docker-entrypoint.sh)
+
+## 设置模块
+
+- [`SBtools/settings/development.py`](SBtools/settings/development.py)：本地开发环境配置
+- [`SBtools/settings/docker.py`](SBtools/settings/docker.py)：Docker 环境配置
+- [`SBtools/settings/production.py`](SBtools/settings/production.py)：非 Docker 的生产环境配置
+
+## 路由说明
+
+- `/`：首页，展示最近片段并提供搜索入口
+- `/video/<videoid>/`：视频详情页，展示该视频下的所有片段
+- `/userid/<userid>/`：用户详情页，展示该用户 ID 的所有片段
+- `/username/<username>/`：用户名详情页，展示该用户名下的所有片段
+- `/uuid/<uuid>/`：片段详情页，展示单个片段及其关联视频上下文
+
+## 许可证
+
+[AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl-3.0.html)
