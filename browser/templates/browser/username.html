@@ -2,9 +2,29 @@
 {% extends "browser/base.html" %}
 {% load browser_extras %}
 {% block head %}
-    <title>Username | BSB Browser</title>
+    <title>{{ username }} | BSB Browser</title>
 {% endblock head %}
 {% block body %}
+    <div class="page-section glass glow-border hero-section">
+        <div class="hero-label">Username</div>
+        <h1 class="hero-title">{{ username }}{% if has_vip_users %}<span class="ms-1" title="Contains VIP users">👑</span>{% endif %}</h1>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <span class="hero-icon">👥</span>
+                <span>Unique users</span>
+                <span>{{ uniques_count }}</span>
+            </div>
+            {% if single_userid %}
+            <div class="hero-divider"></div>
+            <div class="hero-meta-item">
+                <span class="hero-icon">🆔</span>
+                <span>User ID</span>
+                <a href="/userid/{{ single_userid }}/">{{ single_userid }}</a>{% if single_userid_is_vip %}<span class="ms-1">👑</span>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
     <div class="row layout-row">
         <div class="col-auto page-section glass glow-border">
             <ul class="list-group list-group-horizontal">

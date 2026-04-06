@@ -164,6 +164,12 @@ class FilteredUsernameListView(SingleTableMixin, FilterView):
         context['username'] = self.username
         context['uniques'] = Username.objects.filter(username=self.username)
         context['uniques_count'] = context['uniques'].count()
+        unique_userids = list(context['uniques'].values_list('userid', flat=True))
+        context['vip_users_count'] = Vipuser.objects.filter(userid__in=unique_userids).count()
+        context['has_vip_users'] = context['vip_users_count'] > 0
+        if len(unique_userids) == 1:
+            context['single_userid'] = unique_userids[0]
+            context['single_userid_is_vip'] = context['vip_users_count'] == 1
 
         populate_context(context, filter_args)
 

@@ -1,9 +1,25 @@
 {# SPDX-License-Identifier: AGPL-3.0-or-later #}
 {% extends "browser/base.html" %}
 {% block head %}
-    <title>UserID | BSB Browser</title>
+    <title>{{ userid }} | BSB Browser</title>
 {% endblock head %}
 {% block body %}
+    <div class="page-section glass glow-border hero-section">
+        <div class="hero-label">User ID</div>
+        <h1 class="hero-title">{{ userid }}{% if vip %}<span class="ms-1" title="VIP">👑</span>{% endif %}</h1>
+        <div class="hero-meta">
+            <div class="hero-meta-item">
+                <span class="hero-icon">👤</span>
+                <span>Username</span>
+                {% if username and username != '—' and username != '鈥?' %}
+                    <a href="/username/{{ username|urlencode }}/">{{ username }}</a>
+                {% else %}
+                    <span>—</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <div class="row layout-row">
         <div class="col-12 min-w-0">
             <div class="page-section glass glow-border">
