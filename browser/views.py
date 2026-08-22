@@ -24,7 +24,15 @@ china_tz = datetime.timezone(datetime.timedelta(hours=8))
 
 
 def updated() -> str:
-    date = isoparse(Config.objects.get(key='updated').value).astimezone(china_tz)
+    value = Config.objects.filter(key='updated').values_list('value', flat=True).first()
+    if not value:
+        return '更新时间未知'
+
+    try:
+        date = isoparse(value).astimezone(china_tz)
+    except (TypeError, ValueError):
+        return '更新时间未知'
+
     now = datetime.datetime.now(tz=china_tz)
     return f'{date.strftime("%Y-%m-%d %H:%M:%S")} ({timeago.format(date, now, "zh_CN")})'
 
@@ -271,6 +279,6 @@ class FilteredUUIDListView(SingleTableMixin, FilterView):
     filterset_class = VideoFilter
 
 
-def view_404(request, _exception):
+def view_404(request, exception):
     context = {'updated': updated()}
     return render(request, 'browser/404.html', status=404, context=context)
