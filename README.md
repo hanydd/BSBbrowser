@@ -83,6 +83,12 @@ Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 - `/userid/<userid>/`：用户详情页，展示该用户 ID 的所有片段
 - `/username/<username>/`：用户名详情页，展示该用户名下的所有片段
 - `/uuid/<uuid>/`：片段详情页，展示单个片段及其关联视频上下文
+- `/api/getTotalStats`：兼容 SponsorBlockServer 的总统计接口，数据来自浏览器镜像库
+- `/api/getTopUsers`：兼容 SponsorBlockServer 的贡献排行榜接口
+- `/api/getTopCategoryUsers`：兼容 SponsorBlockServer 的分类贡献排行榜接口
+
+兼容统计接口按镜像库中的 `config.updated` 分版本缓存。数据库每次同步后会使用新缓存，
+页面请求不会访问 SponsorBlockServer 的生产数据库。扩展商店用户数单独缓存约 14 小时。
 
 ## 许可证
 

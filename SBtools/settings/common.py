@@ -93,3 +93,11 @@ LOGGING = {
 }
 
 CACHE_MIDDLEWARE_SECONDS = 30
+
+# Statistics API compatibility settings. Database statistics always come from
+# the reporting database configured in the active settings module.
+STATS_MAX_REWARD_TIME_PER_SEGMENT_SECONDS = int(
+    os.environ.get('STATS_MAX_REWARD_TIME_PER_SEGMENT_SECONDS', '86400')
+)
+STATS_HTTP_TIMEOUT_SECONDS = float(os.environ.get('STATS_HTTP_TIMEOUT_SECONDS', '5'))
+STATS_USER_COUNTER_URL = os.environ.get('STATS_USER_COUNTER_URL', '')
