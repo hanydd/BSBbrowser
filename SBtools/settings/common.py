@@ -101,3 +101,7 @@ STATS_MAX_REWARD_TIME_PER_SEGMENT_SECONDS = int(
 )
 STATS_HTTP_TIMEOUT_SECONDS = float(os.environ.get('STATS_HTTP_TIMEOUT_SECONDS', '5'))
 STATS_USER_COUNTER_URL = os.environ.get('STATS_USER_COUNTER_URL', '')
+STATS_DATA_FILE = os.environ.get(
+    'STATS_DATA_FILE',
+    os.path.join(os.path.dirname(BASE_DIR), 'data', 'statistics.json'),
+)

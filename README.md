@@ -86,9 +86,14 @@ Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 - `/api/getTotalStats`：兼容 SponsorBlockServer 的总统计接口，数据来自浏览器镜像库
 - `/api/getTopUsers`：兼容 SponsorBlockServer 的贡献排行榜接口
 - `/api/getTopCategoryUsers`：兼容 SponsorBlockServer 的分类贡献排行榜接口
+- `/stats/api/overview`：DAU、滚动 30 天 MAU、提交增长和跳过次数快照
 
 兼容统计接口按镜像库中的 `config.updated` 分版本缓存。数据库每次同步后会使用新缓存，
 页面请求不会访问 SponsorBlockServer 的生产数据库。扩展商店用户数单独缓存约 14 小时。
+
+运行 `python manage.py refresh_stats` 会从镜像库重新计算活跃用户和提交增长，
+并向 `STATS_DATA_FILE` 追加本次镜像的跳过次数快照。统计文件应挂载到持久化目录，
+不能存放在每小时替换的镜像数据库中。
 
 ## 许可证
 

@@ -18,6 +18,7 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.http import require_GET
 
 from .category_labels import CATEGORY_LABELS
+from .analytics import read_statistics
 from .models import Config
 
 
@@ -373,3 +374,11 @@ def get_top_category_users(request: HttpRequest) -> HttpResponse:
         category,
     )
     return _json_response(result)
+
+
+@require_GET
+def get_stats_overview(_request: HttpRequest) -> JsonResponse:
+    data = read_statistics()
+    if data is None:
+        return JsonResponse({"detail": "Statistics have not been generated yet"}, status=503)
+    return _json_response(data)

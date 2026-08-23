@@ -75,6 +75,24 @@ class StatsCompatibilityApiTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    @patch('browser.stats_api.read_statistics', return_value={
+        'schemaVersion': 1,
+        'summary': {'dau': 10, 'mau30': 20, 'skipCount': 30},
+        'activity': [],
+        'skipSnapshots': [],
+    })
+    def test_stats_overview_uses_new_namespace(self, _read_statistics):
+        response = self.client.get('/stats/api/overview')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['summary']['mau30'], 20)
+
+    @patch('browser.stats_api.read_statistics', return_value=None)
+    def test_stats_overview_returns_503_before_first_refresh(self, _read_statistics):
+        response = self.client.get('/stats/api/overview')
+
+        self.assertEqual(response.status_code, 503)
+
 
 class StatsQueryMappingTests(SimpleTestCase):
     @patch('browser.stats_api.connection')

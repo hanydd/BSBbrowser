@@ -12,5 +12,7 @@ services:
     restart: unless-stopped
     environment:
       DJANGO_SETTINGS_MODULE: SBtools.settings.docker
+    volumes:
+      - "${STATS_DATA_DIR:-./data}:/app/data"
     extra_hosts:
       - "host.docker.internal:host-gateway"
