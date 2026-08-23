@@ -7,7 +7,13 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase, override_settings
 
-from .analytics import _build_activity_series, read_statistics, refresh_statistics
+from .analytics import (
+    _add_video_coverage,
+    _build_activity_series,
+    _build_hourly_distribution,
+    read_statistics,
+    refresh_statistics,
+)
 
 
 class ActivitySeriesTests(SimpleTestCase):
@@ -57,6 +63,35 @@ class ActivitySeriesTests(SimpleTestCase):
         self.assertEqual(result[0]['dailySubmissions'], 0)
         self.assertEqual(result[-1]['cumulativeSubmissions'], 2)
 
+    def test_adds_daily_and_cumulative_video_coverage(self):
+        activity = [
+            {'date': '2024-01-01'},
+            {'date': '2024-01-02'},
+            {'date': '2024-01-03'},
+        ]
+
+        result = _add_video_coverage(activity, [
+            (date(2024, 1, 1), 2),
+            (date(2024, 1, 3), 4),
+        ])
+
+        self.assertEqual(
+            [(item['dailyCoveredVideos'], item['cumulativeCoveredVideos']) for item in result],
+            [(2, 2), (0, 2), (4, 6)],
+        )
+
+    def test_builds_hourly_distribution_and_fills_empty_hours(self):
+        result = _build_hourly_distribution([(0, 9, 18), (18, 27, 54)], 9)
+
+        self.assertEqual(len(result), 24)
+        self.assertEqual(result[0], {
+            'hour': 0,
+            'averageContributors': 1.0,
+            'averageSubmissions': 2.0,
+        })
+        self.assertEqual(result[1]['averageSubmissions'], 0.0)
+        self.assertEqual(result[18]['averageContributors'], 3.0)
+
 
 class StatisticsPersistenceTests(SimpleTestCase):
     def test_refresh_persists_and_replaces_same_source_snapshot(self):
@@ -71,15 +106,36 @@ class StatisticsPersistenceTests(SimpleTestCase):
                         patch('browser.analytics._fetch_daily_user_submissions', return_value=[
                             (date(2026, 1, 1), 'a', 2),
                         ]), \
+                        patch('browser.analytics._fetch_daily_video_coverage', return_value=[
+                            (date(2026, 1, 1), 1),
+                        ]), \
+                        patch('browser.analytics._fetch_hourly_contributions', return_value=[
+                            (10, 1, 2),
+                        ]), \
+                        patch('browser.analytics._fetch_contributor_distribution', return_value=[
+                            {'range': '2–5', 'contributors': 1, 'submissions': 2},
+                        ]), \
+                        patch('browser.analytics._fetch_category_distribution', return_value=[
+                            {'category': 'sponsor', 'submissions': 2, 'skipCount': 10, 'minutesSaved': 3},
+                        ]), \
                         patch('browser.analytics._fetch_current_totals', side_effect=[
-                            {'totalSubmissions': 2, 'skipCount': 10, 'minutesSaved': 3},
-                            {'totalSubmissions': 2, 'skipCount': 12, 'minutesSaved': 4},
+                            {
+                                'totalSubmissions': 2, 'skipCount': 10, 'minutesSaved': 3,
+                                'coveredVideos': 1, 'contributorCount': 1,
+                            },
+                            {
+                                'totalSubmissions': 2, 'skipCount': 12, 'minutesSaved': 4,
+                                'coveredVideos': 1, 'contributorCount': 1,
+                            },
                         ]):
                     refresh_statistics()
                     result = refresh_statistics()
 
                 self.assertEqual(len(result['skipSnapshots']), 1)
                 self.assertEqual(result['skipSnapshots'][0]['skipCount'], 12)
+                self.assertEqual(result['activity'][-1]['cumulativeCoveredVideos'], 1)
+                self.assertEqual(result['hourlyContribution']['points'][10]['averageSubmissions'], 0.0)
+                self.assertEqual(result['contributorDistribution'][0]['range'], '2–5')
                 self.assertEqual(read_statistics()['summary']['mau30'], 1)
                 with open(stats_file, encoding='utf-8') as stream:
-                    self.assertEqual(json.load(stream)['schemaVersion'], 1)
+                    self.assertEqual(json.load(stream)['schemaVersion'], 2)
