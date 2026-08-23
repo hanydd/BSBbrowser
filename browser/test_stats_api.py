@@ -86,6 +86,23 @@ class StatsCompatibilityApiTests(SimpleTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['summary']['mau30'], 20)
+        self.assertEqual(response['Cache-Control'], 'public, max-age=300, stale-while-revalidate=60')
+        self.assertTrue(response['ETag'].startswith('"stats-'))
+
+    @patch('browser.stats_api.read_statistics', return_value={
+        'schemaVersion': 1,
+        'sourceUpdatedAt': '2026-08-23T06:00:04Z',
+        'summary': {},
+        'activity': [],
+        'skipSnapshots': [],
+    })
+    def test_stats_overview_supports_conditional_requests(self, _read_statistics):
+        response = self.client.get(
+            '/stats/api/overview',
+            HTTP_IF_NONE_MATCH='"stats-2026-08-23T06:00:04Z"',
+        )
+
+        self.assertEqual(response.status_code, 304)
 
     @patch('browser.stats_api.read_statistics', return_value=None)
     def test_stats_overview_returns_503_before_first_refresh(self, _read_statistics):

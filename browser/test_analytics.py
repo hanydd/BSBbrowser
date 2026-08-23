@@ -46,6 +46,17 @@ class ActivitySeriesTests(SimpleTestCase):
 
         self.assertEqual(result, [])
 
+    def test_can_start_series_before_first_submission(self):
+        result = _build_activity_series(
+            [(date(2024, 1, 3), 'first-user', 2)],
+            date(2024, 1, 3),
+            date(2024, 1, 1),
+        )
+
+        self.assertEqual(result[0]['date'], '2024-01-01')
+        self.assertEqual(result[0]['dailySubmissions'], 0)
+        self.assertEqual(result[-1]['cumulativeSubmissions'], 2)
+
 
 class StatisticsPersistenceTests(SimpleTestCase):
     def test_refresh_persists_and_replaces_same_source_snapshot(self):

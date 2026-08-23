@@ -18,6 +18,7 @@ from .models import Config
 
 STATS_SCHEMA_VERSION = 1
 STATS_TIME_ZONE = "Asia/Shanghai"
+PROJECT_START_DATE = date(2024, 1, 1)
 SYSTEM_USER_IDS = ("PORT",)
 
 
@@ -78,27 +79,28 @@ def _fetch_current_totals() -> dict[str, int]:
 def _build_activity_series(
     rows: Iterable[tuple[date, str, int]],
     end_date: date,
+    start_date: date | None = None,
 ) -> list[dict[str, Any]]:
     submissions_by_day: Counter[date] = Counter()
     users_by_day: dict[date, set[str]] = defaultdict(set)
     first_date: date | None = None
 
     for submission_day, user_id, submission_count in rows:
-        if submission_day > end_date:
+        if submission_day > end_date or (start_date is not None and submission_day < start_date):
             continue
         submissions_by_day[submission_day] += submission_count
         users_by_day[submission_day].add(user_id)
         if first_date is None or submission_day < first_date:
             first_date = submission_day
 
-    if first_date is None:
+    if first_date is None and start_date is None:
         return []
 
     rolling_days: deque[tuple[date, set[str]]] = deque()
     rolling_users: Counter[str] = Counter()
     cumulative_submissions = 0
     result = []
-    current_day = first_date
+    current_day = start_date or first_date
 
     while current_day <= end_date:
         current_users = users_by_day.get(current_day, set())
@@ -192,6 +194,7 @@ def refresh_statistics() -> dict[str, Any]:
         activity = _build_activity_series(
             _fetch_daily_user_submissions(),
             _source_end_date(source_updated_at),
+            PROJECT_START_DATE,
         )
         totals = _fetch_current_totals()
         latest_activity = activity[-1] if activity else {
@@ -203,6 +206,7 @@ def refresh_statistics() -> dict[str, Any]:
             "schemaVersion": STATS_SCHEMA_VERSION,
             "generatedAt": captured_at,
             "sourceUpdatedAt": source_updated_at,
+            "projectStartedAt": PROJECT_START_DATE.isoformat(),
             "timeZone": STATS_TIME_ZONE,
             "definitions": {
                 "dau": "当天至少提交一个片段的唯一用户数，不含系统用户 PORT",

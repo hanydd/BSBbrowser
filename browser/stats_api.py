@@ -14,7 +14,7 @@ from urllib.request import Request, urlopen
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotModified, JsonResponse
 from django.views.decorators.http import require_GET
 
 from .category_labels import CATEGORY_LABELS
@@ -377,8 +377,15 @@ def get_top_category_users(request: HttpRequest) -> HttpResponse:
 
 
 @require_GET
-def get_stats_overview(_request: HttpRequest) -> JsonResponse:
+def get_stats_overview(request: HttpRequest) -> HttpResponse:
     data = read_statistics()
     if data is None:
         return JsonResponse({"detail": "Statistics have not been generated yet"}, status=503)
-    return _json_response(data)
+    etag = f'"stats-{data.get("sourceUpdatedAt", data.get("generatedAt", "unknown"))}"'
+    if request.headers.get("If-None-Match") == etag:
+        response = HttpResponseNotModified()
+    else:
+        response = _json_response(data)
+    response["ETag"] = etag
+    response["Cache-Control"] = "public, max-age=300, stale-while-revalidate=60"
+    return response
