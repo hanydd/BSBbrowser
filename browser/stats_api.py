@@ -92,6 +92,7 @@ def _cached_database_result(name: str, loader, *key_parts: object):
     latest_key = f"stats-api:{name}:latest:{suffix}"
     cached = cache.get(key)
     if cached is not None:
+        cache.set(latest_key, cached, timeout=None)
         return cached
     try:
         result = loader()

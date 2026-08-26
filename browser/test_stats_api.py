@@ -101,6 +101,23 @@ class StatsCompatibilityApiTests(SimpleTestCase):
 
         self.assertEqual(result, {'stale': True})
 
+    @patch('browser.stats_api._source_version', return_value='version-2')
+    def test_existing_versioned_cache_populates_latest_success(self, _source_version):
+        stats_api.cache.set('stats-api:top-users:version-2:totalSubmissions:false', {'cached': True})
+
+        result = stats_api._cached_database_result(
+            'top-users',
+            MagicMock(side_effect=AssertionError('loader should not run')),
+            'totalSubmissions',
+            'false',
+        )
+
+        self.assertEqual(result, {'cached': True})
+        self.assertEqual(
+            stats_api.cache.get('stats-api:top-users:latest:totalSubmissions:false'),
+            {'cached': True},
+        )
+
     @patch('browser.stats_api._fetch_top_users', return_value={'top': True})
     @patch('browser.stats_api._fetch_total_stats', return_value={'total': True})
     def test_refresh_compatibility_cache_warms_default_statistics(self, fetch_total, fetch_top):
