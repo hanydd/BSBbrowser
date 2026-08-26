@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 from unittest.mock import MagicMock, patch
 
+from django.db import OperationalError
 from django.test import SimpleTestCase, override_settings
 
 from . import stats_api
@@ -11,6 +12,9 @@ TEST_CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemC
 
 @override_settings(CACHES=TEST_CACHES)
 class StatsCompatibilityApiTests(SimpleTestCase):
+    def setUp(self):
+        stats_api.cache.clear()
+
     @patch('browser.stats_api._get_audience_counts', return_value=(103_000, 104_000))
     @patch('browser.stats_api._cached_database_result')
     def test_total_stats_keeps_legacy_response_shape(self, cached_result, _audience_counts):
@@ -74,6 +78,37 @@ class StatsCompatibilityApiTests(SimpleTestCase):
         response = self.client.get('/api/getTopCategoryUsers?sortType=2&category=unknown')
 
         self.assertEqual(response.status_code, 400)
+
+    @patch('browser.stats_api.Config.objects')
+    def test_source_version_is_read_from_persistent_cache(self, config_objects):
+        config_objects.filter.return_value.values_list.return_value.first.return_value = 'version-1'
+
+        self.assertEqual(stats_api._source_version(), 'version-1')
+        self.assertEqual(stats_api._source_version(), 'version-1')
+
+        self.assertEqual(config_objects.filter.call_count, 1)
+
+    @patch('browser.stats_api._source_version', return_value='version-2')
+    def test_database_cache_falls_back_to_latest_success_during_cutover(self, _source_version):
+        stats_api.cache.set('stats-api:top-users:latest:totalSubmissions:false', {'stale': True}, timeout=None)
+
+        result = stats_api._cached_database_result(
+            'top-users',
+            MagicMock(side_effect=OperationalError('database is not accepting connections')),
+            'totalSubmissions',
+            'false',
+        )
+
+        self.assertEqual(result, {'stale': True})
+
+    @patch('browser.stats_api._fetch_top_users', return_value={'top': True})
+    @patch('browser.stats_api._fetch_total_stats', return_value={'total': True})
+    def test_refresh_compatibility_cache_warms_default_statistics(self, fetch_total, fetch_top):
+        stats_api.refresh_compatibility_cache('version-3')
+
+        self.assertEqual(stats_api.cache.get(stats_api.SOURCE_VERSION_CACHE_KEY), 'version-3')
+        self.assertEqual(fetch_total.call_count, 2)
+        self.assertEqual(fetch_top.call_count, len(stats_api.SORT_TYPE_MAP) * 2)
 
     @patch('browser.stats_api.read_statistics', return_value={
         'schemaVersion': 1,

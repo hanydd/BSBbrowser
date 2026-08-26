@@ -13,7 +13,7 @@ from urllib.request import Request, urlopen
 
 from django.conf import settings
 from django.core.cache import cache
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.http import HttpRequest, HttpResponse, HttpResponseNotModified, JsonResponse
 from django.views.decorators.http import require_GET
 
@@ -50,6 +50,7 @@ FIREFOX_ADDON_SLUG = "bilisponsorblock"
 STATS_CACHE_SECONDS = 24 * 60 * 60
 AUDIENCE_REFRESH_SECONDS = 14 * 60 * 60
 AUDIENCE_CACHE_KEY = "stats-api:audience-counts:v1"
+SOURCE_VERSION_CACHE_KEY = "stats-api:source-version:v1"
 
 
 def _json_response(data: dict[str, Any]) -> JsonResponse:
@@ -71,19 +72,56 @@ def _parse_javascript_integer(value: str | None) -> int | None:
 
 
 def _source_version() -> str:
-    return Config.objects.filter(key="updated").values_list("value", flat=True).first() or "unknown"
+    cached = cache.get(SOURCE_VERSION_CACHE_KEY)
+    if cached is not None:
+        return str(cached)
+    version = Config.objects.filter(key="updated").values_list("value", flat=True).first() or "unknown"
+    cache.set(SOURCE_VERSION_CACHE_KEY, version, timeout=None)
+    return version
+
+
+def set_source_version(version: str) -> None:
+    """Publish a new mirror version only after its hourly refresh has completed."""
+    cache.set(SOURCE_VERSION_CACHE_KEY, version, timeout=None)
 
 
 def _cached_database_result(name: str, loader, *key_parts: object):
     version = _source_version()
     suffix = ":".join(str(part) for part in key_parts)
     key = f"stats-api:{name}:{version}:{suffix}"
+    latest_key = f"stats-api:{name}:latest:{suffix}"
     cached = cache.get(key)
     if cached is not None:
         return cached
-    result = loader()
+    try:
+        result = loader()
+    except DatabaseError:
+        stale = cache.get(latest_key)
+        if stale is not None:
+            return stale
+        raise
     cache.set(key, result, STATS_CACHE_SECONDS)
+    cache.set(latest_key, result, timeout=None)
     return result
+
+
+def refresh_compatibility_cache(source_version: str) -> None:
+    """Warm the legacy statistics used by the homepage and leaderboard."""
+    set_source_version(source_version)
+    for count_contributing_users in (False, True):
+        _cached_database_result(
+            "total",
+            lambda enabled=count_contributing_users: _fetch_total_stats(enabled),
+            str(count_contributing_users).lower(),
+        )
+    for sort_by in SORT_TYPE_MAP.values():
+        for category_stats_enabled in (False, True):
+            _cached_database_result(
+                "top-users",
+                lambda field=sort_by, enabled=category_stats_enabled: _fetch_top_users(field, enabled),
+                sort_by,
+                str(category_stats_enabled).lower(),
+            )
 
 
 def _normalise_number(value: Any) -> Any:

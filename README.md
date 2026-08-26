@@ -88,8 +88,9 @@ Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 - `/api/getTopCategoryUsers`：兼容 SponsorBlockServer 的分类贡献排行榜接口
 - `/stats/api/overview`：滚动 24 小时 DAU、自然日 DAU 曲线、滚动 30 天 MAU、提交增长和跳过次数快照
 
-兼容统计接口按镜像库中的 `config.updated` 分版本缓存。数据库每次同步后会使用新缓存，
-页面请求不会访问 SponsorBlockServer 的生产数据库。扩展商店用户数单独缓存约 14 小时。
+兼容统计接口按镜像库中的 `config.updated` 分版本缓存。`refresh_stats` 会在每小时同步后
+预热总统计和排行榜，并永久保留最近一次成功结果；镜像库切换或短暂不可用时，接口会继续
+返回该结果。页面请求不会访问 SponsorBlockServer 的生产数据库。扩展商店用户数单独缓存约 14 小时。
 
 运行 `python manage.py refresh_stats` 会从镜像库重新计算活跃用户和提交增长，
 并向 `STATS_DATA_FILE` 追加本次镜像的跳过次数快照。统计文件应挂载到持久化目录，
