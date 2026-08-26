@@ -31,12 +31,18 @@ def _source_updated_at() -> str:
     return Config.objects.filter(key="updated").values_list("value", flat=True).first() or _iso_utc_now()
 
 
-def _source_end_date(source_updated_at: str) -> date:
+def _source_timestamp(source_updated_at: str) -> datetime:
     try:
         parsed = datetime.fromisoformat(source_updated_at.replace("Z", "+00:00"))
     except ValueError:
-        return datetime.now(timezone.utc).date()
-    return (parsed + timedelta(hours=8)).date()
+        return datetime.now(timezone.utc)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _source_end_date(source_updated_at: str) -> date:
+    return (_source_timestamp(source_updated_at) + timedelta(hours=8)).date()
 
 
 def _fetch_daily_user_submissions() -> list[tuple[date, str, int]]:
@@ -56,6 +62,24 @@ def _fetch_daily_user_submissions() -> list[tuple[date, str, int]]:
             [list(SYSTEM_USER_IDS)],
         )
         return [(row[0], row[1], int(row[2])) for row in cursor.fetchall()]
+
+
+def _fetch_rolling_24h_contributors(source_updated_at: str) -> int:
+    window_end_ms = int(_source_timestamp(source_updated_at).timestamp() * 1000)
+    window_start_ms = window_end_ms - int(timedelta(hours=24).total_seconds() * 1000)
+    with connection.cursor() as cursor:
+        cursor.execute(
+            '''
+            SELECT COUNT(DISTINCT "userID")
+            FROM "sponsorTimes"
+            WHERE "userID" <> ALL(%s)
+              AND "timeSubmitted" > %s
+              AND "timeSubmitted" <= %s
+            ''',
+            [list(SYSTEM_USER_IDS), window_start_ms, window_end_ms],
+        )
+        row = cursor.fetchone()
+    return int(row[0] or 0)
 
 
 def _fetch_current_totals() -> dict[str, int]:
@@ -368,6 +392,7 @@ def refresh_statistics() -> dict[str, Any]:
         existing = _read_existing_file(path)
         source_updated_at = _source_updated_at()
         captured_at = _iso_utc_now()
+        rolling_24h_contributors = _fetch_rolling_24h_contributors(source_updated_at)
         activity = _build_activity_series(
             _fetch_daily_user_submissions(),
             _source_end_date(source_updated_at),
@@ -396,6 +421,7 @@ def refresh_statistics() -> dict[str, Any]:
             "timeZone": STATS_TIME_ZONE,
             "definitions": {
                 "dau": "当天至少提交一个片段的唯一用户数，不含系统用户 PORT",
+                "dau24h": "截至镜像刷新时间最近 24 小时至少提交一个片段的唯一用户数，不含系统用户 PORT",
                 "mau30": "截至当天最近 30 天至少提交一个片段的唯一用户数，不含系统用户 PORT",
                 "submissions": "真实用户提交的片段数，不含系统用户 PORT",
                 "skipCount": "计算时有效片段的累计跳过次数",
@@ -405,6 +431,7 @@ def refresh_statistics() -> dict[str, Any]:
             },
             "summary": {
                 "dau": latest_activity["dau"],
+                "dau24h": rolling_24h_contributors,
                 "mau30": latest_activity["mau30"],
                 "communitySubmissions": latest_activity["cumulativeSubmissions"],
                 **totals,

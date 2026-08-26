@@ -11,6 +11,7 @@ class Command(BaseCommand):
         data = refresh_statistics()
         self.stdout.write(self.style.SUCCESS(
             f"Statistics refreshed from {data['sourceUpdatedAt']}: "
-            f"DAU={data['summary']['dau']} MAU={data['summary']['mau30']} "
+            f"DAU24h={data['summary']['dau24h']} dailyDAU={data['summary']['dau']} "
+            f"MAU={data['summary']['mau30']} "
             f"skips={data['summary']['skipCount']}"
         ))

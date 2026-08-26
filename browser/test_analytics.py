@@ -11,12 +11,26 @@ from .analytics import (
     _add_video_coverage,
     _build_activity_series,
     _build_hourly_distribution,
+    _fetch_rolling_24h_contributors,
     read_statistics,
     refresh_statistics,
 )
 
 
 class ActivitySeriesTests(SimpleTestCase):
+    @patch('browser.analytics.connection')
+    def test_rolling_24h_contributors_uses_source_refresh_time(self, database_connection):
+        query_cursor = database_connection.cursor.return_value.__enter__.return_value
+        query_cursor.fetchone.return_value = (17,)
+
+        result = _fetch_rolling_24h_contributors('2026-01-02T12:34:56Z')
+
+        self.assertEqual(result, 17)
+        parameters = query_cursor.execute.call_args.args[1]
+        self.assertEqual(parameters[0], ['PORT'])
+        self.assertEqual(parameters[2], 1767357296000)
+        self.assertEqual(parameters[2] - parameters[1], 24 * 60 * 60 * 1000)
+
     def test_builds_dau_rolling_mau_and_fills_empty_days(self):
         rows = [
             (date(2026, 1, 1), 'a', 2),
@@ -106,6 +120,7 @@ class StatisticsPersistenceTests(SimpleTestCase):
                         patch('browser.analytics._fetch_daily_user_submissions', return_value=[
                             (date(2026, 1, 1), 'a', 2),
                         ]), \
+                        patch('browser.analytics._fetch_rolling_24h_contributors', return_value=7), \
                         patch('browser.analytics._fetch_daily_video_coverage', return_value=[
                             (date(2026, 1, 1), 1),
                         ]), \
@@ -136,6 +151,8 @@ class StatisticsPersistenceTests(SimpleTestCase):
                 self.assertEqual(result['activity'][-1]['cumulativeCoveredVideos'], 1)
                 self.assertEqual(result['hourlyContribution']['points'][10]['averageSubmissions'], 0.0)
                 self.assertEqual(result['contributorDistribution'][0]['range'], '2–5')
+                self.assertEqual(read_statistics()['summary']['dau'], 1)
+                self.assertEqual(read_statistics()['summary']['dau24h'], 7)
                 self.assertEqual(read_statistics()['summary']['mau30'], 1)
                 with open(stats_file, encoding='utf-8') as stream:
                     self.assertEqual(json.load(stream)['schemaVersion'], 2)
