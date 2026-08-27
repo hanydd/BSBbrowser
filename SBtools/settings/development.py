@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 from SBtools.settings.common import * # noqa
+from os import environ
 
 SECRET_KEY = '70wv4w$tv1suzuf1-2_h9-p%#!qtsz7%(90x%4a=@3yw6rz%0#' # noqa
 
@@ -15,6 +16,16 @@ DATABASES = {
         'HOST': '127.0.0.1',
     }
 }
+
+if environ.get('ANALYTICS_DB_NAME'):
+    DATABASES['analytics'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': environ['ANALYTICS_DB_NAME'],
+        'USER': environ.get('ANALYTICS_DB_USER', 'postgres'),
+        'PASSWORD': environ.get('ANALYTICS_DB_PASSWORD', 'root'),
+        'HOST': environ.get('ANALYTICS_DB_HOST', '127.0.0.1'),
+        'PORT': environ.get('ANALYTICS_DB_PORT', '5432'),
+    }
 
 CACHES = {
     'default': {

@@ -19,6 +19,16 @@ DATABASES = {
     }
 }
 
+if environ.get('ANALYTICS_DB_NAME'):
+    DATABASES['analytics'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': environ['ANALYTICS_DB_NAME'],
+        'USER': environ.get('ANALYTICS_DB_USER', environ.get('POSTGRES_USER', 'sponsorblock')),
+        'PASSWORD': environ.get('ANALYTICS_DB_PASSWORD', environ['DB_PASSWORD']),
+        'HOST': environ.get('ANALYTICS_DB_HOST', environ.get('POSTGRES_HOST', 'host.docker.internal')),
+        'PORT': environ.get('ANALYTICS_DB_PORT', environ.get('POSTGRES_PORT', '5432')),
+    }
+
 SESSION_COOKIE_SECURE = environ.get('SESSION_COOKIE_SECURE', 'true').lower() in ('1', 'true', 'yes')
 CSRF_COOKIE_SECURE = environ.get('CSRF_COOKIE_SECURE', 'true').lower() in ('1', 'true', 'yes')
 SECURE_SSL_REDIRECT = environ.get('SECURE_SSL_REDIRECT', 'true').lower() in ('1', 'true', 'yes')

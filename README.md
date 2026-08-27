@@ -96,6 +96,24 @@ Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 并向 `STATS_DATA_FILE` 追加本次镜像的跳过次数快照。统计文件应挂载到持久化目录，
 不能存放在每小时替换的镜像数据库中。
 
+### 独立统计数据库
+
+设置 `ANALYTICS_DB_NAME` 后，Browser 会把统计数据写入同一 PostgreSQL 实例中的独立数据库，
+并优先从数据库读取；数据库不可用时仍会回退到 `STATS_DATA_FILE`。统计数据库不能使用每小时
+替换的 `POSTGRES_DB`。可以按需设置 `ANALYTICS_DB_USER`、`ANALYTICS_DB_PASSWORD`、
+`ANALYTICS_DB_HOST` 和 `ANALYTICS_DB_PORT`，未设置时沿用镜像库连接参数。
+
+首次启用时按以下顺序迁移，现有 JSON 不会被删除：
+
+```bash
+python manage.py migrate analytics_store --database=analytics --noinput
+python manage.py migrate_statistics_to_database
+```
+
+迁移命令会先在 JSON 同目录创建 `pre-database-*.backup` 备份，再幂等写入数据库，并将完整读取
+结果与原 JSON 比较；不一致时命令失败且保留原文件和备份。后续 `refresh_stats` 同时原子更新
+JSON 和统计数据库。现有镜像同步脚本无需修改。
+
 ## 许可证
 
 [AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl-3.0.html)

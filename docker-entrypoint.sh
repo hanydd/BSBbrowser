@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 python manage.py migrate --noinput
+if [ -n "${ANALYTICS_DB_NAME:-}" ]; then
+    python manage.py migrate analytics_store --database=analytics --noinput
+fi
 exec gunicorn SBtools.wsgi:application \
   --bind "0.0.0.0:${GUNICORN_BIND_PORT:-8000}" \
   --workers "${GUNICORN_WORKERS:-3}" \

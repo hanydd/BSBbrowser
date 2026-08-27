@@ -20,6 +20,7 @@ RUN pip install --retries=10 -r requirements.txt
 
 COPY manage.py ./
 COPY docker-entrypoint.sh ./
+COPY analytics_store ./analytics_store
 COPY browser ./browser
 COPY SBtools ./SBtools
 RUN chmod +x docker-entrypoint.sh \

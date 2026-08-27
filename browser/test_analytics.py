@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from django.db import OperationalError
 from django.test import SimpleTestCase, override_settings
 
 from .analytics import (
@@ -12,6 +13,7 @@ from .analytics import (
     _build_activity_series,
     _build_hourly_distribution,
     _fetch_rolling_24h_contributors,
+    _merge_persisted_history,
     read_statistics,
     refresh_statistics,
 )
@@ -106,13 +108,41 @@ class ActivitySeriesTests(SimpleTestCase):
         self.assertEqual(result[1]['averageSubmissions'], 0.0)
         self.assertEqual(result[18]['averageContributors'], 3.0)
 
+    def test_merges_database_and_json_snapshot_history_without_loss(self):
+        database_data = {
+            'sourceUpdatedAt': '2026-01-03T00:00:00Z',
+            'skipSnapshots': [
+                {'sourceUpdatedAt': '2026-01-01T00:00:00Z', 'skipCount': 1},
+                {'sourceUpdatedAt': '2026-01-03T00:00:00Z', 'skipCount': 3},
+            ],
+        }
+        file_data = {
+            'sourceUpdatedAt': '2026-01-02T00:00:00Z',
+            'skipSnapshots': [
+                {'sourceUpdatedAt': '2026-01-01T00:00:00Z', 'skipCount': 2},
+                {'sourceUpdatedAt': '2026-01-02T00:00:00Z', 'skipCount': 2},
+            ],
+        }
+
+        result = _merge_persisted_history(database_data, file_data)
+
+        self.assertEqual(
+            [(item['sourceUpdatedAt'], item['skipCount']) for item in result['skipSnapshots']],
+            [
+                ('2026-01-01T00:00:00Z', 2),
+                ('2026-01-02T00:00:00Z', 2),
+                ('2026-01-03T00:00:00Z', 3),
+            ],
+        )
+
 
 class StatisticsPersistenceTests(SimpleTestCase):
     def test_refresh_persists_and_replaces_same_source_snapshot(self):
         with TemporaryDirectory() as directory:
             stats_file = str(Path(directory) / 'statistics.json')
             with override_settings(STATS_DATA_FILE=stats_file):
-                with patch('browser.analytics._source_updated_at', return_value='2026-01-01T00:00:00Z'), \
+                with patch('browser.analytics.write_statistics_to_database') as database_writer, \
+                        patch('browser.analytics._source_updated_at', return_value='2026-01-01T00:00:00Z'), \
                         patch('browser.analytics._iso_utc_now', side_effect=[
                             '2026-01-01T00:01:00Z',
                             '2026-01-01T00:02:00Z',
@@ -154,5 +184,25 @@ class StatisticsPersistenceTests(SimpleTestCase):
                 self.assertEqual(read_statistics()['summary']['dau'], 1)
                 self.assertEqual(read_statistics()['summary']['dau24h'], 7)
                 self.assertEqual(read_statistics()['summary']['mau30'], 1)
+                self.assertEqual(database_writer.call_count, 2)
+                self.assertEqual(database_writer.call_args.args[0]['skipSnapshots'][0]['skipCount'], 12)
                 with open(stats_file, encoding='utf-8') as stream:
                     self.assertEqual(json.load(stream)['schemaVersion'], 2)
+
+
+class StatisticsReadFallbackTests(SimpleTestCase):
+    @patch('browser.analytics.database_storage_enabled', return_value=True)
+    @patch('browser.analytics.read_statistics_from_database', return_value={'source': 'database'})
+    def test_prefers_database_statistics(self, _database_reader, _storage_enabled):
+        self.assertEqual(read_statistics(), {'source': 'database'})
+
+    @patch('browser.analytics.database_storage_enabled', return_value=True)
+    @patch('browser.analytics.read_statistics_from_database', side_effect=OperationalError('offline'))
+    def test_falls_back_to_json_when_database_is_unavailable(self, _database_reader, _storage_enabled):
+        with TemporaryDirectory() as directory:
+            stats_file = Path(directory) / 'statistics.json'
+            expected = {'source': 'json'}
+            stats_file.write_text(json.dumps(expected), encoding='utf-8')
+
+            with override_settings(STATS_DATA_FILE=str(stats_file)):
+                self.assertEqual(read_statistics(), expected)

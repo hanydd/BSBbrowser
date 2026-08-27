@@ -18,6 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
+    'analytics_store.apps.AnalyticsStoreConfig',
     'browser.apps.BrowserConfig',
     'django_tables2',
     'django_filters',
@@ -25,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
 ]
+
+DATABASE_ROUTERS = ['analytics_store.router.AnalyticsDatabaseRouter']
 
 MIDDLEWARE = [
     'django.middleware.cache.UpdateCacheMiddleware',

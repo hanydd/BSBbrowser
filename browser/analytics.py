@@ -3,6 +3,7 @@
 
 import fcntl
 import json
+import logging
 import os
 import tempfile
 from collections import Counter, defaultdict, deque
@@ -11,7 +12,13 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from django.conf import settings
-from django.db import connection
+from django.db import DatabaseError, connection
+
+from analytics_store.storage import (
+    database_storage_enabled,
+    read_statistics_from_database,
+    write_statistics_to_database,
+)
 
 from .models import Config
 
@@ -21,6 +28,8 @@ STATS_TIME_ZONE = "Asia/Shanghai"
 PROJECT_START_DATE = date(2024, 1, 1)
 SYSTEM_USER_IDS = ("PORT",)
 HOURLY_DISTRIBUTION_DAYS = 90
+
+logger = logging.getLogger(__name__)
 
 
 def _iso_utc_now() -> str:
@@ -366,6 +375,27 @@ def _merge_skip_snapshot(
     return snapshots
 
 
+def _merge_persisted_history(
+    database_data: dict[str, Any] | None,
+    file_data: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    if database_data is None:
+        return file_data
+    if file_data is None:
+        return database_data
+    merged = dict(database_data)
+    snapshots = {
+        str(item.get('sourceUpdatedAt', item.get('capturedAt', ''))): item
+        for item in database_data.get('skipSnapshots', [])
+    }
+    snapshots.update({
+        str(item.get('sourceUpdatedAt', item.get('capturedAt', ''))): item
+        for item in file_data.get('skipSnapshots', [])
+    })
+    merged['skipSnapshots'] = [snapshots[key] for key in sorted(snapshots) if key]
+    return merged
+
+
 def _write_atomically(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
@@ -389,7 +419,8 @@ def refresh_statistics() -> dict[str, Any]:
 
     with lock_path.open("a+", encoding="utf-8") as lock_file:
         fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
-        existing = _read_existing_file(path)
+        file_existing = _read_existing_file(path)
+        existing = _merge_persisted_history(read_statistics(), file_existing)
         source_updated_at = _source_updated_at()
         captured_at = _iso_utc_now()
         rolling_24h_contributors = _fetch_rolling_24h_contributors(source_updated_at)
@@ -451,8 +482,17 @@ def refresh_statistics() -> dict[str, Any]:
             ),
         }
         _write_atomically(path, data)
+        write_statistics_to_database(data)
         return data
 
 
 def read_statistics() -> dict[str, Any] | None:
+    if database_storage_enabled():
+        try:
+            data = read_statistics_from_database()
+        except DatabaseError as error:
+            logger.warning('Unable to read the analytics database; using the statistics JSON fallback: %s', error)
+        else:
+            if data is not None:
+                return data
     return _read_existing_file(Path(settings.STATS_DATA_FILE))
