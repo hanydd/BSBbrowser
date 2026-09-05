@@ -15,6 +15,34 @@ class StatsCompatibilityApiTests(SimpleTestCase):
     def setUp(self):
         stats_api.cache.clear()
 
+    @patch('browser.stats_api._get_audience_counts', return_value=(103_000, 104_000))
+    @patch('browser.stats_api._cached_database_result')
+    def test_namespaced_routes_match_legacy_routes(self, cached_result, _audience):
+        cases = [
+            ('/stats/api/total', '/api/getTotalStats', '?countContributingUsers=true',
+             {'userCount': 3, 'viewCount': 4, 'totalSubmissions': 5, 'minutesSaved': 6}),
+            ('/stats/api/top-users', '/api/getTopUsers', '?sortType=2&categoryStats=true',
+             {'userNames': ['user'], 'categoryStats': [[1]]}),
+            ('/stats/api/top-category-users', '/api/getTopCategoryUsers', '?sortType=2&category=sponsor',
+             {'userNames': ['user']}),
+            ('/stats/api/days-saved', '/api/getDaysSavedFormatted', '', {'daysSaved': '1.13'}),
+        ]
+        for canonical, legacy, query, data in cases:
+            with self.subTest(path=canonical):
+                cached_result.return_value = data
+                new_response = self.client.get(canonical + query)
+                new_call = cached_result.call_args
+                old_response = self.client.get(legacy + query)
+                self.assertEqual(new_response.status_code, 200)
+                self.assertEqual(new_response.json(), old_response.json())
+                self.assertEqual(new_call.args[0], cached_result.call_args.args[0])
+                self.assertEqual(new_call.args[2:], cached_result.call_args.args[2:])
+
+    def test_namespaced_leaderboards_preserve_validation(self):
+        for path in ('/stats/api/top-users', '/stats/api/top-category-users?sortType=2&category=unknown'):
+            with self.subTest(path=path):
+                self.assertEqual(self.client.get(path).status_code, 400)
+
     @patch('browser.stats_api._source_version', return_value='days-version')
     @patch('browser.stats_api.connection')
     def test_days_saved_preserves_legacy_filter_and_caches_result(self, connection, _version):
