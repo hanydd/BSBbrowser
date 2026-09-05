@@ -109,6 +109,7 @@ def _cached_database_result(name: str, loader, *key_parts: object):
 def refresh_compatibility_cache(source_version: str) -> None:
     """Warm the legacy statistics used by the homepage and leaderboard."""
     set_source_version(source_version)
+    _cached_database_result("days-saved", _fetch_days_saved_formatted)
     for count_contributing_users in (False, True):
         _cached_database_result(
             "total",
@@ -136,6 +137,22 @@ def _normalise_number(value: Any) -> Any:
 def _javascript_round(value: float) -> int:
     """Return the integer produced by Math.round for finite values."""
     return math.floor(value + 0.5)
+
+
+def _fetch_days_saved_formatted() -> dict[str, str]:
+    # Preserve the legacy filter: unlike total stats, negative votes are included.
+    with connection.cursor() as cursor:
+        cursor.execute(
+            '''SELECT SUM(("endTime" - "startTime") / 60 / 60 / 24 * "views")
+               FROM "sponsorTimes" WHERE "shadowHidden" != 1'''
+        )
+        row = cursor.fetchone()
+    value = row[0] if row else None
+    return {"daysSaved": format(float(value), ".2f") if value is not None else "0"}
+
+
+def get_days_saved_formatted(request: HttpRequest) -> JsonResponse:
+    return _json_response(_cached_database_result("days-saved", _fetch_days_saved_formatted))
 
 
 def _fetch_total_stats(count_contributing_users: bool) -> dict[str, Any]:

@@ -15,6 +15,33 @@ class StatsCompatibilityApiTests(SimpleTestCase):
     def setUp(self):
         stats_api.cache.clear()
 
+    @patch('browser.stats_api._source_version', return_value='days-version')
+    @patch('browser.stats_api.connection')
+    def test_days_saved_preserves_legacy_filter_and_caches_result(self, connection, _version):
+        cursor = connection.cursor.return_value.__enter__.return_value
+        cursor.fetchone.return_value = (1.23456789,)
+        for _ in range(2):
+            response = self.client.get('/api/getDaysSavedFormatted')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'daysSaved': '1.23'})
+        cursor.execute.assert_called_once()
+        sql = cursor.execute.call_args.args[0]
+        self.assertIn('"shadowHidden" != 1', sql)
+        self.assertNotIn('votes', sql)
+
+    @patch('browser.stats_api.connection')
+    def test_days_saved_empty_result_is_legacy_zero_string(self, connection):
+        connection.cursor.return_value.__enter__.return_value.fetchone.return_value = (None,)
+        self.assertEqual(stats_api._fetch_days_saved_formatted(), {'daysSaved': '0'})
+
+    @patch('browser.stats_api._source_version', return_value='next-version')
+    @patch('browser.stats_api._fetch_days_saved_formatted', side_effect=OperationalError('cutover'))
+    def test_days_saved_serves_previous_snapshot_during_cutover(self, _fetch, _version):
+        stats_api.cache.set('stats-api:days-saved:latest:', {'daysSaved': '42.00'}, timeout=None)
+        response = self.client.get('/api/getDaysSavedFormatted')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'daysSaved': '42.00'})
+
     @patch('browser.stats_api._get_audience_counts', return_value=(103_000, 104_000))
     @patch('browser.stats_api._cached_database_result')
     def test_total_stats_keeps_legacy_response_shape(self, cached_result, _audience_counts):
@@ -120,8 +147,11 @@ class StatsCompatibilityApiTests(SimpleTestCase):
 
     @patch('browser.stats_api._fetch_top_users', return_value={'top': True})
     @patch('browser.stats_api._fetch_total_stats', return_value={'total': True})
-    def test_refresh_compatibility_cache_warms_default_statistics(self, fetch_total, fetch_top):
+    @patch('browser.stats_api._fetch_days_saved_formatted', return_value={'daysSaved': '1.23'})
+    def test_refresh_compatibility_cache_warms_default_statistics(self, fetch_days, fetch_total, fetch_top):
         stats_api.refresh_compatibility_cache('version-3')
+        fetch_days.assert_called_once_with()
+
 
         self.assertEqual(stats_api.cache.get(stats_api.SOURCE_VERSION_CACHE_KEY), 'version-3')
         self.assertEqual(fetch_total.call_count, 2)
