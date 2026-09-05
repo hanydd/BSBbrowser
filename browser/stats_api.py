@@ -6,7 +6,7 @@ import math
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -148,7 +148,11 @@ def _fetch_days_saved_formatted() -> dict[str, str]:
         )
         row = cursor.fetchone()
     value = row[0] if row else None
-    return {"daysSaved": format(float(value), ".2f") if value is not None else "0"}
+    if value is None:
+        return {"daysSaved": "0"}
+    # Match Number.toFixed(2), including exactly representable half-cent values.
+    rounded = Decimal.from_float(float(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return {"daysSaved": format(rounded, ".2f")}
 
 
 def get_days_saved_formatted(request: HttpRequest) -> JsonResponse:

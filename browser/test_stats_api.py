@@ -34,6 +34,11 @@ class StatsCompatibilityApiTests(SimpleTestCase):
         connection.cursor.return_value.__enter__.return_value.fetchone.return_value = (None,)
         self.assertEqual(stats_api._fetch_days_saved_formatted(), {'daysSaved': '0'})
 
+    @patch('browser.stats_api.connection')
+    def test_days_saved_rounds_half_values_like_javascript(self, connection):
+        connection.cursor.return_value.__enter__.return_value.fetchone.return_value = (1.125,)
+        self.assertEqual(stats_api._fetch_days_saved_formatted(), {'daysSaved': '1.13'})
+
     @patch('browser.stats_api._source_version', return_value='next-version')
     @patch('browser.stats_api._fetch_days_saved_formatted', side_effect=OperationalError('cutover'))
     def test_days_saved_serves_previous_snapshot_during_cutover(self, _fetch, _version):
