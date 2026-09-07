@@ -41,6 +41,7 @@ CATEGORY_STATS_FIELDS = (
     "categorySumHighlight",
     "categorySumFiller",
     "categorySumExclusiveAccess",
+    "categorySumPadding",
 )
 
 CHROME_EXTENSION_ID = "eaoelafamejbnggahofapllmfhlhajdd"

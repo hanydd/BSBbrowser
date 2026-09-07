@@ -253,10 +253,22 @@ class StatsQueryMappingTests(SimpleTestCase):
         self.assertNotIn('categoryStats', without_categories)
         self.assertEqual(without_categories['userNames'], ['user'])
 
-        cursor.fetchall.return_value = [('user', 2, 1, 3.5, 4, 0, *range(10))]
+        cursor.fetchall.return_value = [('user', 2, 1, 3.5, 4, 0, *range(11))]
         with_categories = stats_api._fetch_top_users('totalSubmissions', True)
 
-        self.assertEqual(with_categories['categoryStats'], [list(range(10))])
+        self.assertEqual(with_categories['categoryStats'], [list(range(11))])
+
+    @patch('browser.stats_api.connection')
+    def test_padding_is_included_in_category_total(self, database_connection):
+        cursor = database_connection.cursor.return_value.__enter__.return_value
+        counts = [618, 267, 225, 240, 50, 20, 133, 20, 10, 10, 167]
+        cursor.fetchall.return_value = [('user', 264624, 1760, 3.5, 166, 13, *counts)]
+
+        result = stats_api._fetch_top_users('totalSubmissions', True)
+
+        self.assertIn('"categorySumPadding"', cursor.execute.call_args.args[0])
+        self.assertEqual(result['categoryStats'][0][-1], 167)
+        self.assertEqual(sum(result['categoryStats'][0]), result['totalSubmissions'][0])
 
     @patch('browser.stats_api._http_get_text', return_value='<title>users: 12.3k</title>')
     def test_chrome_user_count_supports_decimal_shield_values(self, _get_text):

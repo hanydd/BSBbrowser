@@ -12,8 +12,6 @@ CATEGORY_LABELS = {
     'padding': '填充内容/前黑/后黑',
     'filler': '离题闲聊/玩笑',
     'music_offtopic': '音乐:非音乐部分',
-    # Kept for compatibility with existing data even if it is not in the new list.
-    'chapter': '章节',
 }
 
 

@@ -1,6 +1,7 @@
 -- Browser-owned reporting objects. Run on the reporting database only.
 BEGIN;
-CREATE MATERIALIZED VIEW IF NOT EXISTS "topUser" AS (
+DROP MATERIALIZED VIEW IF EXISTS "topUser";
+CREATE MATERIALIZED VIEW "topUser" AS (
 SELECT
     COALESCE(sponsor."userName", port."userName") AS "userName",
     COALESCE(sponsor."totalSubmissions", 0) AS "totalSubmissions",
@@ -17,7 +18,8 @@ SELECT
     COALESCE(sponsor."categorySumPreview", 0) AS "categorySumPreview",
     COALESCE(sponsor."categorySumHighlight", 0) AS "categorySumHighlight",
     COALESCE(sponsor."categorySumFiller", 0) AS "categorySumFiller",
-    COALESCE(sponsor."categorySumExclusiveAccess", 0) AS "categorySumExclusiveAccess"
+    COALESCE(sponsor."categorySumExclusiveAccess", 0) AS "categorySumExclusiveAccess",
+    COALESCE(sponsor."categorySumPadding", 0) AS "categorySumPadding"
 FROM (
         SELECT count(*) AS "portVideoSubmissions",
             sum("portVideo".votes) AS "userVotes",
@@ -45,6 +47,7 @@ FROM (
             sum(CASE WHEN ("sponsorTimes".category = 'poi_highlight') THEN 1 ELSE 0 END) AS "categorySumHighlight",
             sum(CASE WHEN ("sponsorTimes".category = 'filler') THEN 1 ELSE 0 END) AS "categorySumFiller",
             sum(CASE WHEN ( "sponsorTimes".category = 'exclusive_access') THEN 1 ELSE 0 END) AS "categorySumExclusiveAccess",
+            sum(CASE WHEN ("sponsorTimes".category = 'padding') THEN 1 ELSE 0 END) AS "categorySumPadding",
             COALESCE("userNames"."userName", "sponsorTimes"."userID") AS "userName"
         FROM "sponsorTimes"
             LEFT JOIN "userNames" ON ("sponsorTimes"."userID" = "userNames"."userID")
