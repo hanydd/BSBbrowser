@@ -34,7 +34,7 @@ until application configuration is changed.
 
 ## Snapshot rotation
 
-`bsb-reporting-rotate.timer` runs at minute 10 of each hour. Its service:
+`bsb-reporting-rotate.timer` runs at the start of each hour. Its service:
 
 1. Checks primary readiness and waits for the incoming database to acknowledge a captured source WAL position.
 2. Disables incoming replication and waits for its workers to stop.

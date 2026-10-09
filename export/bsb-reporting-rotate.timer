@@ -2,7 +2,7 @@
 Description=Hourly BSB snapshot rotation and statistics refresh
 
 [Timer]
-OnCalendar=*-*-* *:10:00
+OnCalendar=*-*-* *:00:00
 AccuracySec=10s
 Persistent=false
 Unit=bsb-reporting-rotate.service
