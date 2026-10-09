@@ -1,0 +1,20 @@
+# Compose override for snapshot reads. Preserve the existing image and data mount.
+# The credential file is generated on the host and is not part of the repository.
+services:
+  web:
+    env_file:
+      - /var/lib/bsb-reporting/migration/browser-snapshot.env
+    environment:
+      DJANGO_SETTINGS_MODULE: SBtools.settings.snapshot
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        if [ -n "$${ANALYTICS_DB_NAME:-}" ]; then
+          python manage.py migrate analytics_store --database=analytics --noinput
+        fi
+        exec gunicorn SBtools.wsgi:application \
+          --bind "0.0.0.0:$${GUNICORN_BIND_PORT:-8000}" \
+          --workers "$${GUNICORN_WORKERS:-3}" \
+          --threads "$${GUNICORN_THREADS:-1}" \
+          --timeout "$${GUNICORN_TIMEOUT:-120}"

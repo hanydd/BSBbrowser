@@ -70,10 +70,14 @@ Web 界面，用于浏览 SponsorBlock 兼容数据库中的数据。
 - [`Dockerfile`](Dockerfile)
 - [`docker-entrypoint.sh`](docker-entrypoint.sh)
 
+使用 PgBouncer 和双库轮换提供冻结快照时，按[快照部署文档](docs/ReportingSnapshots.md)
+配置连接、统计任务和日常部署文件。快照读库使用只读账号，独立统计历史库需要显式配置写入连接。
+
 ## 设置模块
 
 - [`SBtools/settings/development.py`](SBtools/settings/development.py)：本地开发环境配置
 - [`SBtools/settings/docker.py`](SBtools/settings/docker.py)：Docker 环境配置
+- [`SBtools/settings/snapshot.py`](SBtools/settings/snapshot.py)：PgBouncer 事务池下的只读快照配置
 - [`SBtools/settings/production.py`](SBtools/settings/production.py)：非 Docker 的生产环境配置
 
 ## 路由说明

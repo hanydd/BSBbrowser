@@ -1,0 +1,15 @@
+[Unit]
+Description=Sequential initial copy of staged BSB reporting databases
+After=postgresql.service bsb-reporting-guard.service
+Requires=bsb-reporting-guard.service
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 /usr/local/libexec/bsb-reporting/prepare_reporting_replication.py bootstrap
+ExecStopPost=/usr/bin/python3 /usr/local/libexec/bsb-reporting/prepare_reporting_replication.py stop-on-failure
+Nice=10
+CPUQuota=25%
+MemoryMax=128M
+TimeoutStartSec=30min
+UMask=0077

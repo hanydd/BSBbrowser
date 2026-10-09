@@ -1,0 +1,18 @@
+[Unit]
+Description=Resource and WAL guard for staged BSB reporting replication
+After=postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 /usr/local/libexec/bsb-reporting/reporting_replication_guard.py
+Restart=on-failure
+RestartSec=15
+Nice=10
+CPUQuota=20%
+MemoryMax=96M
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

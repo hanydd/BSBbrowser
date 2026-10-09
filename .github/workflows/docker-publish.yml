@@ -13,6 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Test snapshot operations
+        run: python3 -m unittest discover -s export -p test_reporting_snapshot.py -v
+
       - name: bsb-browser
         run: echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/bsb-browser" >> "$GITHUB_ENV"
 
@@ -29,6 +32,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          build-args: |
+            VCS_REF=${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |
